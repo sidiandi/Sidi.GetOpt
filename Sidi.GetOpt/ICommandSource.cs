@@ -28,6 +28,7 @@ namespace Sidi.GetOpt
     {
         IEnumerable<ICommand> Commands { get; }
         IEnumerable<IOption> Options { get; }
+        string Description { get; }
 
         object ParseValue(Type type, string value);
     }

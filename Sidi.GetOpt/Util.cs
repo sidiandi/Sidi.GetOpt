@@ -75,5 +75,11 @@ namespace Sidi.GetOpt
 
             throw new GetOpt.ParseError(null, "Cannot parse value");
         }
+
+        public static string JoinNotEmpty(string separator, params object[] args)
+        {
+            return String.Join(separator, args.Where(_ => _ != null).Select(_ => _.ToString())
+                .Where(_ => !String.IsNullOrEmpty(_)));
+        }
     }
 }

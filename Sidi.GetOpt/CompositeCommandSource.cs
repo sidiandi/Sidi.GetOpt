@@ -19,6 +19,8 @@ namespace Sidi.GetOpt
 
         public IEnumerable<IOption> Options => commandSources.SelectMany(_ => _.Options);
 
+        public string Description => this.commandSources.First().Description;
+
         public object ParseValue(Type type, string value)
         {
             return commandSources

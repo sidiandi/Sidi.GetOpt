@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -40,6 +41,19 @@ namespace Sidi.GetOpt
             for (int i=0; i<this.args.Length; ++i)
             {
                 w.WriteLine("{2}{0}: {1}", i, args[i], i == this.i ? "=>" : "  ");
+            }
+        }
+
+        public bool MovePrevious()
+        {
+            if (i >= 0)
+            {
+                --i;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

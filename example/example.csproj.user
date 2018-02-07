@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\work\sidi.getopt\out\Debug\example\bin\example.exe</StartProgram>
-    <StartArguments>--version</StartArguments>
+    <StartArguments>--help</StartArguments>
   </PropertyGroup>
 </Project>

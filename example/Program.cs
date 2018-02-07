@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace example
 {
+    [Description("Demonstrator for Sidi.GetOpt")]
     class Program
     {
         static void Main(string[] args)
@@ -15,10 +16,10 @@ namespace example
         }
 
         [Description("Increase verbosity")]
-        bool Verbose;
+        bool Verbose = false;
 
         [Description("Wait time in seconds")]
-        Double Time;
+        Double Time = 0.0;
 
         [Description("Wait for 1 second")]
         public void Wait()

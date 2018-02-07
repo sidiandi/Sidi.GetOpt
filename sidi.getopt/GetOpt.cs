@@ -98,6 +98,7 @@ namespace Sidi.GetOpt
 
                 if (parameterType == null)
                 {
+                    a.MovePrevious();
                     return null;
                 }
 
@@ -142,7 +143,7 @@ namespace Sidi.GetOpt
 
         IOption FindLongOption(string longName)
         {
-            return commandSource.Options.First(_ => string.Equals(longName, _.Name, StringComparison.InvariantCultureIgnoreCase));
+            return commandSource.Options.FirstOrDefault(_ => string.Equals(longName, _.Name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         internal ICommand FindCommand(string commandName)
@@ -247,20 +248,34 @@ namespace Sidi.GetOpt
         {
             if (!a.Current.TryRemovePrefix(LongOptionPrefix, out var longName))
             {
-                throw new ParseError(a, "Not a valid long option.");
+                throw new ParseError(a, String.Format("{0} is not a valid long option.", a.Current));
             }
 
-            var o = FindLongOption(longName);
-
+            var p = longName.Split(new[] { '=' }, 2);
+            var optionName = p.First();
             string value = null;
+            if (p.Length > 1)
+            {
+                value = p[1];
+            }
+
+            var o = FindLongOption(optionName);
+            if (o == null)
+            {
+                throw new ParseError(a, String.Format("{0} is not a valid option name.", optionName));
+            }
+
             if (o.Type.Equals(typeof(bool)))
             {
                 value = true.ToString();
             }
             else
             {
-                if (!a.MoveNext()) throw new ParseError(a, "Missing value for option.");
-                value = a.Current;
+                if (value == null)
+                {
+                    if (!a.MoveNext()) throw new ParseError(a, "Missing value for option.");
+                    value = a.Current;
+                }
             }
             o.Set(value);
         }

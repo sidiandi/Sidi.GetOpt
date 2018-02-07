@@ -21,8 +21,8 @@ namespace Sidi.GetOpt
         }
         public void ShowVersion(TextWriter w)
         {
-            var version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyVersionAttribute>().Version;
-            w.WriteLine("Version {0}", version);
+            var entryAssembly = Assembly.GetEntryAssembly();
+            w.WriteLine("Version {0}", entryAssembly.GetName().Version);
         }
     }
 }

@@ -271,6 +271,8 @@ Options:
         public IEnumerable<ICommand> Commands { get; }
         public IEnumerable<IOption> Options { get; }
 
+        public string Description => this.application.GetType().GetDescription();
+
         public object ParseValue(Type type, string value)
         {
             // has application a Parse{Type} method?

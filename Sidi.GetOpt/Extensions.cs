@@ -11,6 +11,13 @@ namespace Sidi.GetOpt
 {
     internal static class Extensions
     {
+        public static string GetDescription(this Type type)
+        {
+            var da = type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            if (da == null) return null;
+            return da.Description;
+        }
+
         public static bool TryRemovePrefix(this string text, string prefix, out string textWithoutPrefix)
         {
             if (text.StartsWith(prefix))

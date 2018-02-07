@@ -44,21 +44,33 @@ namespace Sidi.GetOpt
             }
         }
 
+        static string GetArgumentSyntax(GetOpt g)
+        {
+            return g.commandSource.Commands.Any() ?
+                g.commandSource.Commands.Single().Method.GetArgumentSyntax() : 
+                String.Empty;
+        }
+
+        static string GetOptionSummary(GetOpt g)
+        {
+            return String.Join("\r\n", g.commandSource.Options.Select(Extensions.GetOptionSyntax));
+        }
+
         private void ShowOptionStyleHelp(TextWriter w)
         {
             var g = GetOpt;
             var ea = Assembly.GetEntryAssembly();
             var exeName = g.Invocation;
 
-            w.WriteLine(@"
+            w.WriteLine(g.commandSource.Description + @"
 
-Usage: " + g.Invocation + @" " + (g.commandSource.Commands.Any() ? 
-    g.commandSource.Commands.Single().Method.GetArgumentSyntax() + " " : String.Empty) + @"[option]...
+Usage: " + Util.JoinNotEmpty(" ", g.Invocation, GetArgumentSyntax(g), "[option]...") + @"
 
 Options:
-" + String.Join("\r\n", GetOpt.commandSource.Options.Select(Extensions.GetOptionSyntax)) + @"
+" + GetOptionSummary(g) + @"
 
-");
+"
+                );
         }
 
     private void ShowCommandStyleHelp(TextWriter w)
