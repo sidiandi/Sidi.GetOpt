@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sidi.getopt", "sidi.getopt\sidi.getopt.csproj", "{61F7A995-E927-4E73-93B0-A8ACC9B9F675}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.GetOpt", "Sidi.GetOpt\Sidi.GetOpt.csproj", "{61F7A995-E927-4E73-93B0-A8ACC9B9F675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sidi.getopt.test", "sidi.getopt.test\sidi.getopt.test.csproj", "{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.GetOpt.Test", "Sidi.GetOpt.Test\Sidi.GetOpt.Test.csproj", "{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

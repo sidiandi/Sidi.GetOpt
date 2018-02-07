@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Copyright (c) 2014, Andreas Grimme (http://andreas-grimme.gmxhome.de/)
-
-This file is part of sidi-util.
-
-sidi-util is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-sidi-util is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Import Project="$(BuildDir)\nuget.props" />
+  <Import Project="AssemblyInfo.task" />
+  <Import Project="Nuget.task" />
   
   <PropertyGroup>
     <Configuration>Release</Configuration>
@@ -67,10 +53,14 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 	</Target>
 
 	<Target Name="WriteCommonAssemblyInfo" DependsOnTargets="GetVersion" >
-    <WriteCommonAssemblyInfo />
+    <WriteCommonAssemblyInfo 
+      CompanyName="$(CompanyName)"
+      ProductName="$(ProductName)"
+      Output="$(BuildDir)\..\CommonAssemblyInfo.cs"
+    />
   </Target>
 
-	<Target Name="Build" DependsOnTargets="GetVersion" >
+	<Target Name="Build" DependsOnTargets="GetVersion;WriteCommonAssemblyInfo" >
     <MSBuild Projects="$(SourceDir)\$(ProductName).sln" Properties="Configuration=$(Configuration);Platform=$(Platform);BuildDir=$(BuildDir);Version=$(GfvNuGetVersion)" >
       <Output ItemName="Targets" TaskParameter="TargetOutputs" />
     </MSBuild>
@@ -108,23 +98,19 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
 
   <Target Name="Test" DependsOnTargets="Build">
     <ItemGroup>
-      <TestTargets Include="%(Targets.Identity)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(Filename), 'Test'))"/>
+      <TestTargets Include="%(Targets.Identity)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(Filename), '\.Test$'))"/>
     </ItemGroup>
     <Exec Command="&quot;$(NUnitConsole)&quot; --labels=On --work=&quot;$(TestDir)&quot; --result=&quot;$(TestDir)\TestResult.xml&quot; --labels=All @(TestTargets -> '&quot;%(Identity)&quot;', ' ')" />
   </Target>
 
-  <Target Name="Pack" DependsOnTargets="GetVersion">
-	<RemoveDir Directories="$(PackageDir)"/>
-	<MakeDir Directories="$(PackageDir)" />
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; pack &quot;$(SourceDir)\%(Package.Identity)\%(Package.Identity).csproj&quot; -OutputDirectory &quot;$(PackageDir)&quot; -Version $(GfvNuGetVersion)" />
+  <Target Name="NugetPack" DependsOnTargets="Build">
+    <NugetPack OutputDirectory="$(PackageDir)" Targets="@(Targets)" >
+      <Output ItemName="NugetPackages" TaskParameter="Outputs" />
+    </NugetPack>
   </Target>
 
-  <!-- Push nuget packages to feed -->
-  <Target Name="Push" DependsOnTargets="Test;Pack;DoPush" />
-
-  <!-- Push nuget packages to feed -->
-  <Target Name="DoPush" DependsOnTargets="GetVersion">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; push &quot;$(PackageDir)\$(ProductName).$(GfvNuGetVersion).nupkg&quot; -ApiKey $(NugetApiKey) -Source $(NugetFeed) -Verbosity Detailed" />
+  <Target Name="NugetPush" DependsOnTargets="NugetPack">
+    <NugetPush Packages="@(NugetPackages)" Source="$(NugetSource)" />
   </Target>
 
   <Target Name="Run" DependsOnTargets="Build">
@@ -150,6 +136,9 @@ along with sidi-util. If not, see <http://www.gnu.org/licenses/>.-->
   
   <Target Name="Clean" >
     <RemoveDir Directories="$(BuildDir)" />
+  </Target>
+
+  <Target Name="Release" DependsOnTargets="Test;NugetPush">
   </Target>
 
 </Project>

@@ -6,6 +6,9 @@
     TaskFactory="CodeTaskFactory"  
     AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll" >  
     <ParameterGroup>  
+      <CompanyName Required="true" />
+      <ProductName Required="true" />
+      <Output Required="true" />
     </ParameterGroup>  
     <Task>  
       <Reference Include="System.Xml" />
@@ -15,3 +18,4 @@
       <Code Source="WriteCommonAssemblyInfo.cs" />
     </Task>  
   </UsingTask>  
+</Project>

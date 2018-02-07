@@ -4,6 +4,7 @@
   <PropertyGroup>
     <CompanyName>sidiandi</CompanyName>
     <ProductName>Sidi.GetOpt</ProductName>
+    <NugetSource>C:\Users\andreas\Dropbox\nuget</NugetSource>
   </PropertyGroup>
   
   <PropertyGroup>

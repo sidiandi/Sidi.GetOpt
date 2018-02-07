@@ -33,4 +33,39 @@
       <Code Source="NugetRestore.cs" />
     </Task>  
   </UsingTask>  
+
+  <UsingTask  
+    TaskName="NugetPack"  
+    TaskFactory="CodeTaskFactory"  
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll" >  
+    <ParameterGroup>  
+      <OutputDirectory Required="true" />
+      <Targets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Outputs ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>  
+    <Task>  
+      <Reference Include="System.Xml" />
+      <Reference Include="System.Xml.Linq" />  
+      <Using Namespace="System.Xml.Linq" />  
+      <Using Namespace="System.Text.RegularExpressions" />  
+      <Code Source="NugetPack.cs" />
+    </Task>  
+  </UsingTask>  
+
+  <UsingTask  
+    TaskName="NugetPush"  
+    TaskFactory="CodeTaskFactory"  
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll" >  
+    <ParameterGroup>  
+      <Packages ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Source />
+    </ParameterGroup>  
+    <Task>  
+      <Reference Include="System.Xml" />
+      <Reference Include="System.Xml.Linq" />  
+      <Using Namespace="System.Xml.Linq" />  
+      <Using Namespace="System.Text.RegularExpressions" />  
+      <Code Source="NugetPack.cs" />
+    </Task>
+  </UsingTask>  
 </Project>
