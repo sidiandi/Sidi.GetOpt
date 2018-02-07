@@ -18,11 +18,10 @@ namespace Sidi.GetOpt
 
             var commandSource = (ICommandSource)new CommandSource(() => getOpt, application);
 
-            if (commandSource.Commands.Count() > 1)
-            {
-                commandSource = commandSource.Concat(new CommandSource(() => getOpt, new HelpCommands(() => getOpt)));
-            }
-            commandSource = commandSource.Concat(new CommandSource(() => getOpt, new HelpApplication(() => getOpt)));
+            commandSource = commandSource.Concat(
+                new CommandSource(() => getOpt, new HelpApplication(() => getOpt)),
+                new CommandSource(() => getOpt, new VersionApplication())
+                );
 
             getOpt = new GetOpt(commandSource);
             getOpt.Invocation = Process.GetCurrentProcess().ProcessName;
@@ -71,7 +70,7 @@ namespace Sidi.GetOpt
 
         public object GetParameter(Type parameterType, Args a)
         {
-            if (parameterType.IsArray)
+            if (parameterType != null && parameterType.IsArray)
             {
                 return GetArrayParameter(parameterType, a);
             }
@@ -95,6 +94,11 @@ namespace Sidi.GetOpt
                 {
                     HandleShortOption(a);
                     continue;
+                }
+
+                if (parameterType == null)
+                {
+                    return null;
                 }
 
                 return Util.ParseValue(this.commandSource, parameterType, a.Current);
@@ -315,6 +319,8 @@ namespace Sidi.GetOpt
 
         void ParseNext(Args a)
         {
+            Trace.TraceInformation("ParseNext:\r\n{0}", a);
+
             // long option?
             if (LongOptionPrefix.Any(a.Current.StartsWith))
             {
@@ -342,6 +348,11 @@ namespace Sidi.GetOpt
                 }
 
                 return 0;
+            }
+            catch (GetOpt.ParseError e)
+            {
+                Console.Error.WriteLine("An error occured while parsing the command line arguments: {0}", e.Message);
+                return -1;
             }
             catch (Exception e)
             {

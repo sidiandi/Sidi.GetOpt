@@ -84,7 +84,7 @@ namespace Sidi.GetOpt.Test
         public void ShowHelpForCommand()
         {
             var calc = new Calculator();
-            var e = GetOpt.Run(calc, new[] { "help", "sum" });
+            var e = GetOpt.Run(calc, new[] { "sum", "--help"});
             Assert.AreEqual(0, e);
         }
 
@@ -92,10 +92,20 @@ namespace Sidi.GetOpt.Test
         public void CommandClass()
         {
             var commands = new Commands();
-            var e = GetOpt.Run(commands, new[] { "help" });
+            var e = GetOpt.Run(commands, new[] { "--help" });
             Assert.AreEqual(0, e);
 
             Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--help" }));
+
+            Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--print", "sum", "1", "2", "3" }));
+            Assert.AreEqual(6.0, commands.Calculator.Result);
+        }
+
+        [Test]
+        public void EmptyApplication()
+        {
+            var e = GetOpt.Run(new Empty(), new[] { "--help" });
+            Assert.AreEqual(0, e);
         }
     }
 }

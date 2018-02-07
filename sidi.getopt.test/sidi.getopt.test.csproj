@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="Calculator.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="Empty.cs" />
     <Compile Include="ExtensionsTest.cs" />
     <Compile Include="GetOptTest.cs" />
     <Compile Include="HelloWorld.cs" />

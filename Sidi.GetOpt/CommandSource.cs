@@ -76,6 +76,7 @@ namespace Sidi.GetOpt
                 var parameters = this.method.GetParameters()
                     .Select(_ => getOpt.GetParameter(_.ParameterType, args))
                     .ToArray();
+                getOpt.GetParameter(null, args); // make sure all remaining options are parsed
                 this.method.Invoke(this.application, parameters);
             }
 
@@ -149,10 +150,6 @@ Options:
 
                 var commandSource = (ICommandSource)new CommandSource(() => getOpt, getInstance());
 
-                if (commandSource.Commands.Count() > 1)
-                {
-                    commandSource = commandSource.Concat(new CommandSource(() => getOpt, new HelpCommands(() => getOpt)));
-                }
                 commandSource = commandSource.Concat(new CommandSource(() => getOpt, new HelpApplication(() => getOpt)));
 
                 getOpt = new GetOpt(commandSource);

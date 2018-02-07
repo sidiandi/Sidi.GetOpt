@@ -30,21 +30,7 @@ namespace Sidi.GetOpt
             }
         }
 
-        [Description("Show version information.")]
-        public bool Version
-        {
-            set
-            {
-                ShowVersion(Console.Out);
-            }
-        }
-
         public Func<GetOpt> GetGetOpt { get; }
-
-        public void ShowVersion(TextWriter w)
-        {
-            w.WriteLine("Version");
-        }
 
         public void ShowHelp(TextWriter w)
         {
@@ -66,7 +52,8 @@ namespace Sidi.GetOpt
 
             w.WriteLine(@"
 
-Usage: " + g.Invocation + @" " + g.commandSource.Commands.Single().Method.GetArgumentSyntax() + @" [option]...
+Usage: " + g.Invocation + @" " + (g.commandSource.Commands.Any() ? 
+    g.commandSource.Commands.Single().Method.GetArgumentSyntax() + " " : String.Empty) + @"[option]...
 
 Options:
 " + String.Join("\r\n", GetOpt.commandSource.Options.Select(Extensions.GetOptionSyntax)) + @"
@@ -82,15 +69,15 @@ Options:
 
             w.WriteLine(@"
 
-Usage: " + g.Invocation + @" <command>
+Usage: " + g.Invocation + @" [option]... <command>
 
 where <command> is one of:");
             w.Wrap(String.Join(", ", g.commandSource.Commands.Select(_ => _.Name)), 4, 72);
 
             w.WriteLine(@"
 
-" + exeName + @" help <command>  help for command <command>
-" + exeName + @" help            overview
+Options:
+" + String.Join("\r\n", GetOpt.commandSource.Options.Select(Extensions.GetOptionSyntax)) + @"
 
 ");
         }

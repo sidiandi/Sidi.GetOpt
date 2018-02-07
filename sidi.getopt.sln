@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.GetOpt", "Sidi.GetOpt\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidi.GetOpt.Test", "Sidi.GetOpt.Test\Sidi.GetOpt.Test.csproj", "{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "example", "example\example.csproj", "{19F1E97E-0147-4471-8AD5-B3D654ACB5B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DAEE6E4-00B1-4334-AFE4-C74A7CDA82E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F1E97E-0147-4471-8AD5-B3D654ACB5B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F1E97E-0147-4471-8AD5-B3D654ACB5B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F1E97E-0147-4471-8AD5-B3D654ACB5B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F1E97E-0147-4471-8AD5-B3D654ACB5B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

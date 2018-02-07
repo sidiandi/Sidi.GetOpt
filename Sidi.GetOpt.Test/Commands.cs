@@ -4,12 +4,14 @@
     {
         public Commands()
         {
+            Calculator = new Calculator();
+            Hello = new HelloWorld();
         }
 
         [Command]
-        HelloWorld Hello => new HelloWorld();
+        public HelloWorld Hello;
 
         [Command]
-        Calculator Calculator => new Calculator();
+        public Calculator Calculator;
     }
 }
