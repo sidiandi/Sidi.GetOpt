@@ -9,6 +9,30 @@ namespace Sidi.GetOpt
 {
     internal class Util
     {
+        public static IDictionary<string, IOption> DetermineShortOptions(IEnumerable<IOption> options)
+        {
+            var d = new Dictionary<string, IOption>();
+            foreach (var o in options.Reverse())
+            {
+                d[o.Name.Substring(0, 1).ToLower()] = o;
+            }
+            return d;
+        }
+
+        static public bool HasPrefix(string text, string[] prefixes, out string reminder)
+        {
+            foreach (var i in prefixes)
+            {
+                if (text.StartsWith(i))
+                {
+                    reminder = text.Substring(i.Length);
+                    return true;
+                }
+            }
+            reminder = null;
+            return false;
+        }
+
         static internal string CSharpIdentifierToLongOption(string csharpIdentifier)
         {
             var o = new StringWriter();
@@ -73,7 +97,7 @@ namespace Sidi.GetOpt
                 }
             }
 
-            throw new GetOpt.ParseError(null, "Cannot parse value");
+            throw new ParseError(null, "Cannot parse value");
         }
 
         public static string JoinNotEmpty(string separator, params object[] args)

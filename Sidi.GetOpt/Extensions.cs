@@ -18,6 +18,13 @@ namespace Sidi.GetOpt
             return da.Description;
         }
 
+        public static string GetDescription(this MemberInfo member)
+        {
+            var da = member.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            if (da == null) return null;
+            return da.Description;
+        }
+
         public static bool TryRemovePrefix(this string text, string prefix, out string textWithoutPrefix)
         {
             if (text.StartsWith(prefix))
@@ -102,6 +109,22 @@ namespace Sidi.GetOpt
             return p.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>().Description;
         }
 
+        public static Type GetValueType(this MemberInfo member)
+        {
+            if (member is PropertyInfo)
+            {
+                return ((PropertyInfo)member).PropertyType;
+            }
+            else if (member is FieldInfo)
+            {
+                return ((FieldInfo)member).FieldType;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public static Func<object> GetGetter(this MemberInfo member, object containingObject)
         {
             if (member is PropertyInfo)
@@ -120,15 +143,22 @@ namespace Sidi.GetOpt
             }
         }
 
+        public static Func<object> GetGetter(this MemberInfo member, Func<object> containingObjectGetter)
+        {
+            var cog = containingObjectGetter;
+            var m = member;
+            return () => m.GetGetter(cog())();
+        }
+
         static string GetArgumentSyntax(this ParameterInfo _)
         {
             if (_.ParameterType.IsArray)
             {
-                return String.Format("<{0}: {1}>...", _.Name, _.ParameterType.GetElementType().Name);
+                return String.Format("[{0}: {1}]...", _.Name, _.ParameterType.GetElementType().Name);
             }
             else
             {
-                return String.Format("<{0}: {1}>", _.Name, _.ParameterType.Name);
+                return String.Format("[{0}: {1}]", _.Name, _.ParameterType.Name);
             }
         }
 
@@ -137,7 +167,7 @@ namespace Sidi.GetOpt
             return String.Join(" ", m.GetParameters().Select(GetArgumentSyntax));
         }
 
-        public static string GetOptionSyntax(IOption option)
+        public static string GetSummary(this IOption option)
         {
             if (option.Type.Equals(typeof(bool)))
             {
@@ -149,6 +179,9 @@ namespace Sidi.GetOpt
             }
         }
 
-
+        public static string GetSummary(this ICommand command)
+        {
+            return String.Format("{0} : {1}", command.Name, command.Description);
+        }
     }
 }

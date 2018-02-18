@@ -100,8 +100,8 @@
     <ItemGroup>
       <TestTargets Include="%(Targets.Identity)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(Filename), '\.Test$'))"/>
     </ItemGroup>
-    <Exec Command="&quot;$(NUnitConsole)&quot; --labels=On --work=&quot;$(TestDir)&quot; --result=&quot;$(TestDir)\TestResult.xml&quot; --labels=All @(TestTargets -> '&quot;%(Identity)&quot;', ' ')" />
-  </Target>
+    <Exec Command="&quot;$(NUnitConsole)&quot; --noheader  --labels=On --work=&quot;$(TestDir)&quot; --result=&quot;$(TestDir)\TestResult.xml&quot; --labels=All @(TestTargets -> '&quot;%(Identity)&quot;', ' ')" />
+  </Target>  
 
   <Target Name="NugetPack" DependsOnTargets="Build">
     <NugetPack OutputDirectory="$(PackageDir)" Targets="@(Targets)" >

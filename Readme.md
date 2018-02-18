@@ -4,7 +4,8 @@ Library for easy implementation of Linu getopt compliant command line interfaces
 
 ## Todo
 - help
-- Command Objects
+- built-in value parsers for TimeSpan, DateTime, TextReader
 - extensible value parsers
 
 ## Done
+- Command Objects

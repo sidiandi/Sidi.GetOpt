@@ -27,6 +27,7 @@
     <Compile Include="ExtensionsTest.cs" />
     <Compile Include="GetOptTest.cs" />
     <Compile Include="HelloWorld.cs" />
+    <Compile Include="PosixProgramArgumentSyntaxConventions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

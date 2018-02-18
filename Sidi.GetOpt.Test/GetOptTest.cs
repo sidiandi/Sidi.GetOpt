@@ -12,7 +12,7 @@ namespace Sidi.GetOpt.Test
         [Test]
         public void Run()
         {
-            var e = GetOpt.Run(new HelloWorld(), new[] { "Donald" });
+            var e = GetOpt.Run(new HelloWorld(), new[] { "Donald", "Dagobert" });
             Assert.AreEqual(0, e);
         }
 
@@ -105,6 +105,24 @@ namespace Sidi.GetOpt.Test
         public void EmptyApplication()
         {
             var e = GetOpt.Run(new Empty(), new[] { "--help" });
+            Assert.AreEqual(0, e);
+        }
+
+        [Test]
+        public void OptionStyleApplication()
+        {
+            var args = Enumerable.Range(0, 10).Select(_ => _.ToString()).ToArray();
+            var a = new OptionsApplication();
+            var e = GetOpt.Run(a, args);
+            Assert.AreEqual(0, e);
+            Assert.IsTrue(args.SequenceEqual(a.arguments), string.Join(",", a.arguments)); 
+        }
+
+        [Test]
+        public void OptionStyleApplicationUsage()
+        {
+            var a = new OptionsApplication();
+            var e = GetOpt.Run(a, new[] { "--help" });
             Assert.AreEqual(0, e);
         }
     }

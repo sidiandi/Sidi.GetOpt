@@ -5,14 +5,20 @@ using System.Linq;
 
 namespace Sidi.GetOpt
 {
-    public class Args
+    internal class Args
     {
         public readonly string[] args;
         public int i = -1;
+        public IList<object> parameters = new List<object>();
+
+        internal string[] LongOptionPrefix { get; set; }
+        internal string[] ShortOptionPrefix { get; set; }
 
         public Args(string[] args)
         {
             this.args = args ?? throw new System.ArgumentNullException(nameof(args));
+            LongOptionPrefix = new[] { "--" };
+            ShortOptionPrefix = new[] { "-" };
         }
 
         public bool MoveNext()
@@ -26,6 +32,12 @@ namespace Sidi.GetOpt
         public string Current => args[i];
 
         public IEnumerable<string> Rest => args.Skip(i);
+
+        public string Next => this.args[i + 1];
+
+        public bool HasNext => (i + 1) < args.Length;
+
+        public bool TreatAsParameters { set; get; }
 
         public override string ToString()
         {

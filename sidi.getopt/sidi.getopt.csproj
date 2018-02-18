@@ -18,15 +18,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="CommandAttribute.cs" />
-    <Compile Include="CommandSource.cs" />
+    <None Include="CommandSource.cs" />
+    <Compile Include="CommandSourceCommand.cs" />
     <Compile Include="CompositeCommandSource.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GetOpt.cs" />
+    <Compile Include="HelpOption.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="ICommandSource.cs" />
+    <Compile Include="IOption.cs" />
+    <Compile Include="MethodCommand.cs" />
+    <Compile Include="ObjectCommand.cs" />
+    <Compile Include="ObjectCommandSource.cs" />
+    <Compile Include="Option.cs" />
+    <Compile Include="ParseError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HelpApplication.cs" />
-    <Compile Include="TestFixtureAttribute.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VersionApplication.cs" />
   </ItemGroup>

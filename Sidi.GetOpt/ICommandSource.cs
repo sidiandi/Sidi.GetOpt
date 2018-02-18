@@ -7,24 +7,8 @@ using System.Threading.Tasks;
 
 namespace Sidi.GetOpt
 {
-    public interface ICommand
-    {
-        string Name { get; }
-        MethodInfo Method { get; }
 
-        void Invoke(Args args);
-    }
-
-    public interface IOption
-    {
-        Type Type { get; }
-        string Name { get; }
-        object Description { get; }
-
-        void Set(string value);
-    }
-
-    public interface ICommandSource
+    internal interface ICommandSource
     {
         IEnumerable<ICommand> Commands { get; }
         IEnumerable<IOption> Options { get; }
@@ -33,11 +17,41 @@ namespace Sidi.GetOpt
         object ParseValue(Type type, string value);
     }
 
-    public static class ICommandSourceExtensions
+    internal static class ICommandSourceExtensions
     {
         public static ICommandSource Concat(this ICommandSource commandSource, params ICommandSource[] sources)
         {
             return new CompositeCommandSource(new[] { commandSource }.Concat(sources));
+        }
+
+        public static IOption FindShortOption(this ICommandSource commandSource, string shortName)
+        {
+            var byShort = Util.DetermineShortOptions(commandSource.Options);
+            return byShort[shortName.ToLower()];
+        }
+
+        public static IOption FindLongOption(this ICommandSource commandSource, string longName)
+        {
+            return commandSource.Options.FirstOrDefault(_ => string.Equals(longName, _.Name, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public static ICommand FindCommand(this ICommandSource commandSource, string commandName)
+        {
+            if (String.IsNullOrEmpty(commandName))
+            {
+                return null;
+            }
+
+            var candidates = commandSource.Commands.Where(_ => _.Name.Equals(commandName)).ToList();
+            if (!candidates.Any())
+            {
+                candidates = commandSource.Commands.Where(_ => _.Name.StartsWith(commandName)).ToList();
+            }
+            if (candidates.Count > 1)
+            {
+                throw new ParseError(null, "Ambiguous command. Could be: " + String.Join(", ", candidates));
+            }
+            return candidates.FirstOrDefault();
         }
     }
 }

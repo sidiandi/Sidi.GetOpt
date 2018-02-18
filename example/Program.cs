@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace example
+#pragma warning disable 414
+
+namespace example 
 {
     [Description("Demonstrator for Sidi.GetOpt")]
     class Program
