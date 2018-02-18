@@ -268,7 +268,7 @@ namespace Sidi.GetOpt
 
         public override string ToString()
         {
-            return String.Format("Command {0}", this.Name);
+            return String.Format("{0} : {1}", this.Name, this.Description);
         }
 
         MethodCommand(Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)

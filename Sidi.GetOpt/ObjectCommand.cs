@@ -39,15 +39,15 @@ namespace Sidi.GetOpt
         }
 
         public string Name { get; }
+
+        public override string ToString()
+        {
+            return String.Format("{0} : {1}", this.Name, this.Description);
+        }
+
         public ICommandSource CommandSource { get; set; }
 
-        public string Description
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string Description => CommandSource.Description;
 
         bool OptionStop(Args args)
         {
@@ -79,7 +79,7 @@ namespace Sidi.GetOpt
 
             args.MoveNext();
 
-            for (;!String.IsNullOrEmpty(optionText);)
+            for (; !String.IsNullOrEmpty(optionText);)
             {
                 var name = optionText.Substring(0, 1);
                 var valueText = optionText.Substring(1);
@@ -220,7 +220,7 @@ namespace Sidi.GetOpt
 
         public int Invoke(Args args)
         {
-            for (;args.HasNext;)
+            for (; args.HasNext;)
             {
                 if (!Parse(args))
                 {
@@ -230,9 +230,63 @@ namespace Sidi.GetOpt
             return result;
         }
 
+        const string endl = "\r\n";
+
+        string CommandSynopsis
+        {
+            get
+
+            {
+                if (this.CommandSource.Commands.Any())
+                {
+                    return "Commands:" + endl + String.Join(endl, this.CommandSource.Commands) + endl;
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
+
+        string OptionSynopsis
+        {
+            get
+
+            {
+                if (this.CommandSource.Options.Any())
+                {
+                    return "Options:" + endl + String.Join(endl, this.CommandSource.Options) + endl;
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
+
+        bool MultiCommand => CommandSource.Commands.Count() > 1;
+
         public void PrintUsage(TextWriter w)
         {
-            w.WriteLine(this.ToString());
+            if (MultiCommand)
+            {
+                w.WriteLine(@"Usage: " + this.Name + @" [option]... <command>
+
+" + this.Description + @"
+
+" + CommandSynopsis + @"
+" + OptionSynopsis + @"
+");
+            }
+            else
+            {
+                w.WriteLine(@"Usage: " + this.Name + @" [option]... <arguments>
+
+" + this.Description + @"
+
+" + OptionSynopsis + @"
+");
+            }
         }
     }
 }

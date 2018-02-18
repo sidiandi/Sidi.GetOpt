@@ -6,7 +6,7 @@ namespace Sidi.GetOpt
     {
         Type Type { get; }
         string Name { get; }
-        object Description { get; }
+        string Description { get; }
 
         void Set(string value);
     }

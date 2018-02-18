@@ -106,7 +106,8 @@ namespace Sidi.GetOpt
 
         public static string GetUsage(this MemberInfo p)
         {
-            return p.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>().Description;
+            var a = p.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            return a == null ? null : a.Description;
         }
 
         public static Type GetValueType(this MemberInfo member)

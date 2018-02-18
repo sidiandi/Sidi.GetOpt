@@ -6,8 +6,12 @@ using System.Reflection;
 
 namespace Sidi.GetOpt
 {
-    class Option
+    abstract class Option : IOption
     {
+        public abstract Type Type { get; }
+        public string Name { get; protected set; }
+        public abstract string Description { get; }
+
         public static IOption Create(Func<object> getInstance, MemberInfo member)
         {
             if (getInstance == null)
@@ -33,11 +37,11 @@ namespace Sidi.GetOpt
 
             if (member is FieldInfo)
             {
-                return (IOption)new FieldOption(getInstance, (FieldInfo)member, description.Description);
+                return (IOption)new FieldOption(getInstance, (FieldInfo)member);
             }
             else if (member is PropertyInfo)
             {
-                return (IOption)new PropertyOption(getInstance, (PropertyInfo)member, description.Description);
+                return (IOption)new PropertyOption(getInstance, (PropertyInfo)member);
             }
             throw new NotSupportedException(String.Format("{0} of type {1} is not supported.", member, member.GetType()));
         }
@@ -50,53 +54,66 @@ namespace Sidi.GetOpt
                 .ToList();
         }
 
-        class FieldOption : IOption
+        public abstract void Set(string value);
+
+        bool NeedsValue => !this.Type.Equals(typeof(bool));
+
+        public override string ToString()
         {
-            private readonly Func<object> getInstance;
-            private readonly FieldInfo field;
-            private readonly string usage;
-
-            public FieldOption(Func<object> getInstance, FieldInfo field, string usage)
+            if (NeedsValue)
             {
-                this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
-                this.field = field ?? throw new ArgumentNullException(nameof(field));
-                this.usage = usage ?? throw new ArgumentNullException(nameof(usage));
-                Name = Util.CSharpIdentifierToLongOption(field.Name);
+                return String.Format("--{0}={2} : {1}", this.Name, this.Description, this.Type.Name);
             }
-
-            public Type Type => field.FieldType;
-
-            public string Name { get; }
-
-            public object Description => field.GetUsage();
-
-            public void Set(string value)
+            else
             {
-                field.SetValue(this.getInstance(), Util.ParseValue(getInstance(), this.Type, value));
+                return String.Format("--{0} : {1}", this.Name, this.Description);
             }
         }
 
-        class PropertyOption : IOption
+        class FieldOption : Option
+        {
+            private readonly Func<object> getInstance;
+            private readonly FieldInfo field;
+
+            public FieldOption(Func<object> getInstance, FieldInfo field)
+            {
+                this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
+                this.field = field ?? throw new ArgumentNullException(nameof(field));
+                Name = Util.CSharpIdentifierToLongOption(field.Name);
+            }
+
+            public override Type Type => field.FieldType;
+
+            public override string Description => field.GetUsage();
+
+            public override void Set(string value)
+            {
+                field.SetValue(this.getInstance(), Util.ParseValue(getInstance(), this.Type, value));
+            }
+
+            public override string ToString()
+            {
+                return String.Format("--{0} : {1}", this.Name, this.Description);
+            }
+        }
+
+        class PropertyOption : Option
         {
             private readonly Func<object> getInstance;
             private readonly PropertyInfo property;
-            private readonly string usage;
 
-            public PropertyOption(Func<object> getInstance, PropertyInfo property, string usage)
+            public PropertyOption(Func<object> getInstance, PropertyInfo property)
             {
                 this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
                 this.property = property ?? throw new ArgumentNullException(nameof(property));
-                this.usage = usage ?? throw new ArgumentNullException(nameof(usage));
                 this.Name = Util.CSharpIdentifierToLongOption(property.Name);
             }
 
-            public Type Type => property.PropertyType;
+            public override Type Type => property.PropertyType;
 
-            public string Name { get; }
+            public override string Description => property.GetUsage();
 
-            public object Description => property.GetUsage();
-
-            public void Set(string value)
+            public override void Set(string value)
             {
                 try
                 {

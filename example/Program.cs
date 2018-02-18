@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace example 
 {
-    [Description("Demonstrator for Sidi.GetOpt")]
+    [Description(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
     class Program
     {
         static void Main(string[] args)
