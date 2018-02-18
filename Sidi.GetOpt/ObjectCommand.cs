@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -165,9 +166,6 @@ namespace Sidi.GetOpt
             return true;
         }
 
-        ParameterInfo[] parameterInfos;
-        Func<object[], int> action;
-
         // parses next argument
         bool Parse(Args args)
         {
@@ -265,28 +263,48 @@ namespace Sidi.GetOpt
         }
 
         bool MultiCommand => CommandSource.Commands.Count() > 1;
+        ICommand SingleCommand
+        {
+            get
+            {
+                var c = CommandSource.Commands.SingleOrDefault();
+                if (c == null)
+                {
+                    c = MethodCommand.Create(() => this, this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
+                }
+                return c;
+            }
+        }
+
+        [Description("")]
+        public void Nothing()
+        {
+
+        }
+
+        public string ArgumentSyntax => throw new NotImplementedException();
 
         public void PrintUsage(TextWriter w)
         {
             if (MultiCommand)
             {
-                w.WriteLine(@"Usage: " + this.Name + @" [option]... <command>
-
-" + this.Description + @"
-
-" + CommandSynopsis + @"
-" + OptionSynopsis + @"
-");
+                w.WriteLine(new[]
+                {
+                    @"Usage: " + this.Name + @" [option]... <command>",
+                    this.Description,
+                    CommandSynopsis,
+                    OptionSynopsis
+                }.JoinNonEmpty(endl + endl));
             }
             else
             {
-                w.WriteLine(@"Usage: " + this.Name + @" [option]... <arguments>
-
-" + this.Description + @"
-
-" + OptionSynopsis + @"
-");
-            }
+                w.WriteLine(new[]
+                {
+                    @"Usage: " + this.Name + @" [option]... " + SingleCommand.ArgumentSyntax,
+                    this.Description,
+                    OptionSynopsis
+                }.JoinNonEmpty(endl+endl));
         }
+    }
     }
 }

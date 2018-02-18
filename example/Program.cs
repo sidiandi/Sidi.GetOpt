@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace example 
 {
     [Description(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
-    class Program
+    class example
     {
         static void Main(string[] args)
         {
-            Sidi.GetOpt.GetOpt.Run(new Program(), args);
+            Sidi.GetOpt.GetOpt.Run(new example(), args);
         }
 
         [Description("Increase verbosity")]

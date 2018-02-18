@@ -11,6 +11,11 @@ namespace Sidi.GetOpt
 {
     internal static class Extensions
     {
+        public static string JoinNonEmpty(this IEnumerable<string> items, string separator)
+        {
+            return String.Join(separator, items.Where(_ => _ != null).Select(_ => _.Trim()).Where(_ => !String.IsNullOrEmpty(_)));
+        }
+
         public static string GetDescription(this Type type)
         {
             var da = type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();

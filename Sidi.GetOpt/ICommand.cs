@@ -8,5 +8,6 @@ namespace Sidi.GetOpt
         string Name { get; }
         void PrintUsage(TextWriter w);
         string Description { get; }
+        string ArgumentSyntax { get; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,12 @@ namespace Sidi.GetOpt
             Options = Option.GetOptions(type, getInstance).ToList();
             Commands = Command.GetCommands(type, getInstance, Options).ToList();
             this.type = type ?? throw new ArgumentNullException(nameof(type));
+        }
+
+        class NoCommand
+        {
+            [Description("")]
+            public void Nothing() { }
         }
 
         public IEnumerable<ICommand> Commands { get; }

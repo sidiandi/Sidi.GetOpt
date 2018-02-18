@@ -9,15 +9,10 @@ namespace Sidi.GetOpt
 {
     class MethodCommand : ICommand
     {
-        private readonly Func<GetOpt> getGetOpt;
-        private readonly object application;
         private readonly Func<object> getInstance;
         private readonly MethodInfo method;
-        private readonly string usage;
 
         public string Name => Util.CSharpIdentifierToLongOption(method.Name);
-
-        GetOpt getOpt => getGetOpt();
 
         public MethodInfo Method => this.method;
 

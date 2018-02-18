@@ -16,7 +16,7 @@ namespace Sidi.GetOpt
         {
             try
             {
-                var command = ObjectCommand.Create("exe", application.GetType(), () => application);
+                var command = ObjectCommand.Create(Util.CSharpIdentifierToLongOption(application.GetType().Name), application.GetType(), () => application);
                 return command.Invoke(new Args(args));
             }
             catch (ParseError ex)
