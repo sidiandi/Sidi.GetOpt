@@ -71,6 +71,7 @@ namespace Sidi.GetOpt
             }
 
             // has application a Parse{Type} method?
+            if (application != null)
             {
                 var parser = type.GetParser(application.GetType(), "Parse" + type.Name);
                 if (parser != null)

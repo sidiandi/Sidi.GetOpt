@@ -212,7 +212,8 @@ namespace Sidi.GetOpt
             if (args.parameters.Count >= parameterInfo.Length)
             {
                 // execute method - enough parameters
-                var r = this.method.Invoke(getInstance(), args.parameters.ToArray());
+                var instance = getInstance();
+                var r = this.method.Invoke(instance, args.parameters.ToArray());
                 result = r is int ? (int)r : 0;
                 return false;
             }

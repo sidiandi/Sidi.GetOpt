@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\work\sidi.getopt\out\Debug\example\bin\example.exe</StartProgram>
-    <StartArguments>--help</StartArguments>
+    <StartArguments>calculate add 3    4</StartArguments>
   </PropertyGroup>
 </Project>
