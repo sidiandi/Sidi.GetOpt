@@ -31,10 +31,10 @@ namespace example
     [Description(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
     class Example
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             // Add this line to Main to start command line parsing
-            GetOpt.Run(new Example(), args);
+            return GetOpt.Run(new Example(), args);
         }
 
         // Decorate fields with the Description attribute to turn them into options.

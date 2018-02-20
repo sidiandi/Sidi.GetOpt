@@ -21,7 +21,6 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandAttribute.cs" />
     <None Include="CommandSource.cs" />
-    <Compile Include="CommandSourceCommand.cs" />
     <Compile Include="CompositeCommandSource.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GetOpt.cs" />

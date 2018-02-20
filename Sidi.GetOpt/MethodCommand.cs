@@ -96,11 +96,7 @@ namespace Sidi.GetOpt
                 var name = optionText.Substring(0, 1);
                 var valueText = optionText.Substring(1);
 
-                var byShort = Util.DetermineShortOptions(options);
-                if (!byShort.TryGetValue(name, out var option))
-                {
-                    throw new ParseError(args, String.Format("No short option {0}", name));
-                }
+                var option = this.options.FindShortOption(args, name);
 
                 if (option.Type.Equals(typeof(bool)))
                 {
@@ -151,16 +147,7 @@ namespace Sidi.GetOpt
             var name = p.First();
             var valueText = p.Length == 2 ? p[1] : null;
 
-            var candidates = options.Where(_ => string.Equals(_.Name, optionText, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            if (candidates.Count() > 1)
-            {
-                throw new ParseError(args, String.Format("option {0} is not unique. Possible options: {1}", name, String.Join(", ", candidates.Select(_ => _.Name))));
-            }
-            if (candidates.Count() == 0)
-            {
-                throw new ParseError(args, String.Format("no option {0}", name));
-            }
-            var option = candidates.Single();
+            var option = this.options.FindLongOption(args);
 
             if (option.Type.Equals(typeof(bool)))
             {

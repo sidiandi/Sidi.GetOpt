@@ -42,11 +42,30 @@ class Example
 }
 ````
 
+Result:
+````
+C:\>example --help
+Usage: example [option]... <command>
+
+Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.
+
+Commands:
+wait : Wait for 1 second
+calculate : Basic arithmetic operations
+
+Options:
+--verbose : Increase verbosity
+--time : Wait time in seconds
+--help : Show this help message
+````
 
 ## Todo
+- parameter files
+- version info
 - built-in value parsers for TimeSpan, DateTime, TextReader
 - extensible value parsers
 
 ## Done
 - Command Objects
 - help
+- abbreviations of commands and options

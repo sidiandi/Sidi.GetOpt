@@ -17,5 +17,17 @@ namespace Sidi.GetOpt.Test
             Assert.IsTrue(textWithPrefix.TryRemovePrefix("--", out var textWithoutPrefix));
             Assert.AreEqual("cordially", textWithoutPrefix);
         }
+
+        [Test]
+        public void Abbreviation()
+        {
+            Assert.IsTrue("a".IsAbbreviation("Apple"));
+            Assert.IsTrue("Apple".IsAbbreviation("Apple"));
+            Assert.IsFalse("b".IsAbbreviation("Apple"));
+            Assert.IsTrue("ae".IsAbbreviation("Apple"));
+            Assert.IsTrue("apl".IsAbbreviation("Apple"));
+            Assert.IsTrue("ri".IsAbbreviation("reverse-integration"));
+            Assert.IsFalse("printer".IsAbbreviation("print"));
+        }
     }
 }

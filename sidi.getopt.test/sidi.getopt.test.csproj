@@ -21,7 +21,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abbreviations.cs" />
     <Compile Include="Calculator.cs" />
+    <Compile Include="CaptureConsoleOutput.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Empty.cs" />
     <Compile Include="ExtensionsTest.cs" />
