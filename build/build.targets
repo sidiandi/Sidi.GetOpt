@@ -18,7 +18,7 @@
   
   <!-- Tools -->
 	<PropertyGroup>
-		<NUnitConsole>&quot;$(Nuget_NUnit_ConsoleRunner_ToolsDirectory)\nunit3-console.exe&quot;</NUnitConsole>
+		<NUnitConsole>$(Nuget_NUnit_ConsoleRunner_ToolsDirectory)\nunit3-console.exe</NUnitConsole>
 		<Nuget>NuGet.exe</Nuget>
 		<Git>git</Git>
     <GithubRelease>github-release.exe</GithubRelease>
