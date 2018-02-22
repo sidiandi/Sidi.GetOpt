@@ -24,9 +24,9 @@ namespace Sidi.GetOpt.Test
         {
             Console.SetOut(originalOutput);
             Console.SetError(originalError);
-            Console.WriteLine("Output:");
+            Console.WriteLine("Console.Out");
             Console.WriteLine(output);
-            Console.WriteLine("Error:");
+            Console.WriteLine("Console.Error");
             Console.WriteLine(error);
         }
     }

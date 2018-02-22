@@ -7,6 +7,9 @@
   </PropertyGroup>
   <Import Project="..\build\ConsoleExe.props" />
   <ItemGroup>
+    <Reference Include="Sidi.GetOpt, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Sidi.GetOpt.0.1.0\lib\net461\Sidi.GetOpt.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -23,12 +26,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sidi.GetOpt\Sidi.GetOpt.csproj">
-      <Project>{61f7a995-e927-4e73-93b0-a8acc9b9f675}</Project>
-      <Name>Sidi.GetOpt</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\GitVersionTask.4.0.0-beta0012\build\GitVersionTask.targets" Condition="Exists('..\..\packages\GitVersionTask.4.0.0-beta0012\build\GitVersionTask.targets')" />

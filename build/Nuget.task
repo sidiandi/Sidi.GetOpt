@@ -30,7 +30,7 @@
       <Reference Include="System.Xml.Linq" />  
       <Using Namespace="System.Xml.Linq" />  
       <Using Namespace="System.Text.RegularExpressions" />  
-      <Code Source="NugetRestore.cs" />
+      <Code Source="Nuget.cs" />
     </Task>  
   </UsingTask>  
 
@@ -48,7 +48,7 @@
       <Reference Include="System.Xml.Linq" />  
       <Using Namespace="System.Xml.Linq" />  
       <Using Namespace="System.Text.RegularExpressions" />  
-      <Code Source="NugetPack.cs" />
+      <Code Source="Nuget.cs" />
     </Task>  
   </UsingTask>  
 
@@ -65,7 +65,7 @@
       <Reference Include="System.Xml.Linq" />  
       <Using Namespace="System.Xml.Linq" />  
       <Using Namespace="System.Text.RegularExpressions" />  
-      <Code Source="NugetPack.cs" />
+      <Code Source="Nuget.cs" />
     </Task>
   </UsingTask>  
 </Project>

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <CompanyName>sidiandi</CompanyName>
     <ProductName>Sidi.GetOpt</ProductName>
-    <NugetSource>C:\Users\andreas\Dropbox\nuget</NugetSource>
+    <NugetSource>https://api.nuget.org/v3/index.json</NugetSource>
   </PropertyGroup>
   
   <PropertyGroup>
-    <GITHUB_REPO>sidi.getopt</GITHUB_REPO>
+    <GITHUB_REPO>$(ProductName)</GITHUB_REPO>
   </PropertyGroup>
 
   <!-- define secret project properties in a private .props file. See build/api_key_example.props for an example -->
