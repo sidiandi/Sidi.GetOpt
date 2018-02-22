@@ -58,22 +58,28 @@ public class SubProcess
     public string Input = String.Empty;
     public string Output;
     public string Error;
+
+    Process p;
     public int ExitCode;
 
     public async System.Threading.Tasks.Task RunChecked()
     {
-		var r = await Run();
-		if (r.ExitCode != 0)
+		await Run();
+		if (ExitCode != 0)
 		{
-			Console.WriteLine(r);
+			Console.WriteLine(this);
 			throw new Exception("Exit code not null");
 		}
-		return r;
 	}
+
+    public override string ToString()
+    {
+        return String.Format("{0} {1}, exit code: {2}, pid: {3}", p.StartInfo.FileName, p.StartInfo.Arguments, ExitCode, p.Id);
+    }
 
     public async System.Threading.Tasks.Task Run()
     {
-        var p = new Process
+        p = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -86,10 +92,10 @@ public class SubProcess
             }
         };
 
-        Console.WriteLine("{0} {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
-        
         p.Start();
 
+        Console.WriteLine("start: {0}", this);
+        
         using (var output = new StringWriter())
         using (var error = new StringWriter())
         using (var input = new StringReader(Input))
@@ -99,6 +105,7 @@ public class SubProcess
                 CopyToAsync(p.StandardError, error),
                 CopyToAsync(input, p.StandardInput));
             p.WaitForExit();
+            Console.WriteLine("exit: {0}", this);
             Output = output.ToString();
             Error = error.ToString();
             ExitCode = p.ExitCode;
@@ -257,7 +264,7 @@ public class NugetPush: ITask
             {
                 args.AddRange(new[]{"-Source", Source});
             }
-            new SubProcess("nuget",args.ToArray()).Run();
+            new SubProcess("nuget",args.ToArray()).RunChecked().Wait();
         }
         return true;  
     }  
@@ -303,7 +310,7 @@ public class NugetRestore: ITask
 
     public bool Execute()  
     {  
-		new SubProcess("nuget", new[]{"restore", SolutionFile}).Run();
+		new SubProcess("nuget", new[]{"restore", SolutionFile}).RunChecked().Wait();
         return true;  
     }  
 }  
