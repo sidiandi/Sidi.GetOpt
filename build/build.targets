@@ -110,6 +110,8 @@
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="NugetPack">
+		<Message Text="Pushing $(GfvSemVer)" />
+		<Message Text="$(NugetApiKey)" />
     <NugetPush Packages="@(NugetPackages)" Source="$(NugetSource)" ApiKey="$(NugetApiKey)" />
   </Target>
 
