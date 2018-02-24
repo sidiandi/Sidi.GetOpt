@@ -108,6 +108,10 @@ public class SubProcess
             Console.WriteLine("exit with exit code {1}: {0}", this, this.ExitCode);
             Output = output.ToString();
             Error = error.ToString();
+            if (!String.IsNullOrEmpty(Error))
+            {
+                Console.WriteLine("Error: {0}", Error);
+            }
         }
     }
 }
@@ -324,6 +328,51 @@ public class NugetRestore: ITask
     public bool Execute()  
     {  
 		new SubProcess("nuget", new[]{"restore", SolutionFile}).RunChecked().Wait();
+        return true;  
+    }  
+}  
+
+public class NugetUpdate: ITask  
+{  
+    //When implementing the ITask interface, it is necessary to  
+    //implement a BuildEngine property of type  
+    //Microsoft.Build.Framework.IBuildEngine. This is done for  
+    //you if you derive from the Task class.  
+    private IBuildEngine buildEngine;  
+    public IBuildEngine BuildEngine  
+    {  
+        get  
+        {  
+            return buildEngine;  
+        }  
+        set  
+        {  
+            buildEngine = value;  
+        }  
+        }  
+
+    // When implementing the ITask interface, it is necessary to  
+    // implement a HostObject property of type Object.  
+    // This is done for you if you derive from the Task class.  
+    private ITaskHost hostObject;  
+    public ITaskHost HostObject  
+    {  
+        get  
+        {  
+            return hostObject;  
+        }  
+
+        set  
+        {  
+            hostObject = value;  
+        }  
+    } 
+
+    public string SolutionFile { get; set; } 
+
+    public bool Execute()  
+    {  
+		new SubProcess("nuget", new[]{"update", SolutionFile}).RunChecked().Wait();
         return true;  
     }  
 }  

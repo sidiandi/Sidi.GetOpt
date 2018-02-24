@@ -134,6 +134,14 @@
     />
   </Target>
 
+  <Target Name="BuildExample">
+    <PropertyGroup>
+      <ExampleSolution>$(SourceDir)\example\example.sln</ExampleSolution>
+    </PropertyGroup>
+    <NugetUpdate SolutionFile="$(ExampleSolution)" />
+    <MSBuild Projects="$(ExampleSolution)" />
+  </Target>
+
   <Target Name="Submit" DependsOnTargets="Test">
     <Exec Command="git commit ." />
     <Exec Command="git push" />

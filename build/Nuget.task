@@ -35,6 +35,22 @@
   </UsingTask>  
 
   <UsingTask  
+    TaskName="NugetUpdate"  
+    TaskFactory="CodeTaskFactory"  
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll" >  
+    <ParameterGroup>  
+      <SolutionFile Required="true" />
+    </ParameterGroup>  
+    <Task>  
+      <Reference Include="System.Xml" />
+      <Reference Include="System.Xml.Linq" />  
+      <Using Namespace="System.Xml.Linq" />  
+      <Using Namespace="System.Text.RegularExpressions" />  
+      <Code Source="Nuget.cs" />
+    </Task>  
+  </UsingTask>  
+
+  <UsingTask  
     TaskName="NugetPack"  
     TaskFactory="CodeTaskFactory"  
     AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll" >  
