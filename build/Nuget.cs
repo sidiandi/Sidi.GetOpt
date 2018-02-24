@@ -60,7 +60,7 @@ public class SubProcess
     public string Error;
 
     Process p;
-    public int ExitCode;
+    public int ExitCode { get{ return p.ExitCode; } }
 
     public async System.Threading.Tasks.Task RunChecked()
     {
@@ -74,7 +74,7 @@ public class SubProcess
 
     public override string ToString()
     {
-        return String.Format("{0} {1}, exit code: {2}, pid: {3}", p.StartInfo.FileName, p.StartInfo.Arguments, ExitCode, p.Id);
+        return String.Format("{0} {1}, pid: {2}", p.StartInfo.FileName, p.StartInfo.Arguments, p.Id);
     }
 
     public async System.Threading.Tasks.Task Run()
@@ -105,10 +105,9 @@ public class SubProcess
                 CopyToAsync(p.StandardError, error),
                 CopyToAsync(input, p.StandardInput));
             p.WaitForExit();
-            Console.WriteLine("exit: {0}", this);
+            Console.WriteLine("exit with exit code {1}: {0}", this, this.ExitCode);
             Output = output.ToString();
             Error = error.ToString();
-            ExitCode = p.ExitCode;
         }
     }
 }
@@ -145,12 +144,19 @@ public static class Util
 
 public static class Nuget
 {
-    public static string Pack(string csProjFile, string outputDirectory)
+    public static string Pack(string csProjFile, string outputDirectory, string version)
     {
         string package = null;
-        var p = new SubProcess("nuget", "pack", csProjFile, "-OutputDirectory", outputDirectory);
-        p.Run().Wait();
-        package = p.Output.RegexGet(@"Successfully created package '([^']+)'.");
+        var p = new List<string>();
+        p.AddRange(new[]{ "pack", csProjFile, "-OutputDirectory", outputDirectory });
+        if (!String.IsNullOrEmpty(version))
+        {
+            p.AddRange(new[]{"-Version", version});
+        }
+
+        var nuget = new SubProcess("nuget", p.ToArray());
+        nuget.Run().Wait();
+        package = nuget.Output.RegexGet(@"Successfully created package '([^']+)'.");
         Console.WriteLine(package);
         return package;
     }
@@ -193,6 +199,7 @@ public class NugetPack: ITask
     } 
 
     public string OutputDirectory { get; set; } 
+    public string Version { set; get; }
     public ITaskItem[] Targets { set; get; }
     public ITaskItem[] Outputs { set; get; }
 
@@ -208,7 +215,7 @@ public class NugetPack: ITask
         foreach (var target in targetsToPack)
         {
             // Util.Dump(Console.Out, target);
-            output.Add(new TaskItem(Nuget.Pack(target.GetMetadata("MSBuildSourceProjectFile"), this.OutputDirectory)));
+            output.Add(new TaskItem(Nuget.Pack(target.GetMetadata("MSBuildSourceProjectFile"), this.OutputDirectory, Version)));
         }
         Outputs = output.ToArray();
 
@@ -254,12 +261,18 @@ public class NugetPush: ITask
 
     public ITaskItem[] Packages { set; get; }
     public string Source {get; set; }
+    public string ApiKey {get; set; }
 
     public bool Execute()  
     {  
+        if (ApiKey == null)
+        {
+            throw new ArgumentNullException("ApiKey");
+        }
+
         foreach (var package in Packages)
         {
-            var args = new List<string>{"push", package.ItemSpec };
+            var args = new List<string>{"push", package.ItemSpec, ApiKey };
             if (Source != null)
             {
                 args.AddRange(new[]{"-Source", Source});

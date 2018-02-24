@@ -104,13 +104,13 @@
   </Target>  
 
   <Target Name="NugetPack" DependsOnTargets="Build">
-    <NugetPack OutputDirectory="$(PackageDir)" Targets="@(Targets)" >
+    <NugetPack OutputDirectory="$(PackageDir)" Targets="@(Targets)" Version="$(GfvNuGetVersion)" >
       <Output ItemName="NugetPackages" TaskParameter="Outputs" />
     </NugetPack>
   </Target>
 
   <Target Name="NugetPush" DependsOnTargets="NugetPack">
-    <NugetPush Packages="@(NugetPackages)" Source="$(NugetSource)" />
+    <NugetPush Packages="@(NugetPackages)" Source="$(NugetSource)" ApiKey="$(NugetApiKey)" />
   </Target>
 
   <Target Name="Run" DependsOnTargets="Build">
@@ -132,6 +132,11 @@
     <Exec Command="&quot;$(GithubRelease)&quot; upload --tag $(ReleaseTag) --name &quot;$(ProductName)-$(GfvFullSemVer).msi&quot; --replace --file @(SetupFiles -> '&quot;%(Identity)&quot;', ' ')" 
       EnvironmentVariables="$(GithubReleaseEnvironmentVariables)"
     />
+  </Target>
+
+  <Target Name="Submit" DependsOnTargets="Test">
+    <Exec Command="git commit ." />
+    <Exec Command="git push" />
   </Target>
   
   <Target Name="Clean" >

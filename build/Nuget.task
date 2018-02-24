@@ -42,6 +42,7 @@
       <OutputDirectory Required="true" />
       <Targets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
       <Outputs ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      <Version />
     </ParameterGroup>  
     <Task>  
       <Reference Include="System.Xml" />
@@ -59,6 +60,7 @@
     <ParameterGroup>  
       <Packages ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
       <Source />
+      <ApiKey />
     </ParameterGroup>  
     <Task>  
       <Reference Include="System.Xml" />
