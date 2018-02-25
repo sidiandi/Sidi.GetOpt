@@ -7,18 +7,23 @@ namespace Sidi.GetOpt
 {
     internal class Args
     {
-        public readonly string[] args;
+        string[] args;
         public int i = -1;
         public IList<object> parameters = new List<object>();
 
         internal string[] LongOptionPrefix { get; set; }
         internal string[] ShortOptionPrefix { get; set; }
 
-        public Args(string[] args)
+        public Args(IEnumerable<string> args)
         {
-            this.args = args ?? throw new System.ArgumentNullException(nameof(args));
+            this.args = (args ?? throw new System.ArgumentNullException(nameof(args))).ToArray();
             LongOptionPrefix = new[] { "--" };
             ShortOptionPrefix = new[] { "-" };
+        }
+
+        public void Insert(IEnumerable<string> toInsert)
+        {
+            args = args.Take(i+1).Concat(toInsert).Concat(args.Skip(i+1)).ToArray();
         }
 
         public bool MoveNext()

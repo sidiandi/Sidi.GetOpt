@@ -20,7 +20,7 @@ namespace Sidi.GetOpt
 
         public string ArgumentSyntax => this.method.GetArgumentSyntax();
 
-        public static ICommand Create(Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
+        public static ICommand Create(ICommand parent, Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
         {
             if (inheritedOptions == null)
             {
@@ -31,9 +31,9 @@ namespace Sidi.GetOpt
             if (description == null) return null;
 
             var help = new HelpOption();
-            var helpCommand = new ObjectCommandSource(help.GetType(), () => help);
+            var helpCommand = new ObjectCommandSource(null, help.GetType(), () => help);
 
-            var c = new MethodCommand(getInstance, method, helpCommand.Options.Concat(inheritedOptions));
+            var c = new MethodCommand(parent, getInstance, method, helpCommand.Options.Concat(inheritedOptions));
 
             help.Command = c;
             return c;
@@ -244,9 +244,34 @@ namespace Sidi.GetOpt
             return true;
         }
 
+        const string endl = "\r\n";
+
+        string OptionSynopsis
+        {
+            get
+
+            {
+                if (options.Any())
+                {
+                    return "Options:" + endl + String.Join(endl, options) + endl;
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
+
+        public ICommand Parent { get; }
+
         public void PrintUsage(TextWriter w)
         {
-            w.WriteLine(this);
+            w.WriteLine(new[]
+            {
+                @"Usage: " + this.GetInvocation() + @" [option]... " + this.method.GetArgumentSyntax(),
+                this.Description,
+                OptionSynopsis
+            }.JoinNonEmpty(endl + endl));
         }
 
         public override string ToString()
@@ -254,13 +279,14 @@ namespace Sidi.GetOpt
             return String.Format("{0} : {1}", this.Name, this.Description);
         }
 
-        MethodCommand(Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
+        MethodCommand(ICommand parent, Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
         {
             this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
             this.method = method ?? throw new ArgumentNullException(nameof(method));
             this.parameterInfo = method.GetParameters();
             this.inheritedOptions = inheritedOptions ?? Enumerable.Empty<IOption>();
             this.options = this.inheritedOptions;
+            this.Parent = parent;
         }
     }
 }

@@ -22,6 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abbreviations.cs" />
+    <Compile Include="Args.cs" />
+    <Compile Include="ArgumentFileTests.cs" />
     <Compile Include="Calculator.cs" />
     <Compile Include="CaptureConsoleOutput.cs" />
     <Compile Include="Commands.cs" />
@@ -29,6 +31,7 @@
     <Compile Include="ExtensionsTest.cs" />
     <Compile Include="GetOptTest.cs" />
     <Compile Include="HelloWorld.cs" />
+    <Compile Include="OptionArgumentFile.cs" />
     <Compile Include="PosixProgramArgumentSyntaxConventions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -20,7 +20,7 @@ namespace Sidi.GetOpt
         public static ICommand AddHelp(this ObjectCommand command)
         {
             var help = new HelpOption();
-            command.CommandSource = command.CommandSource.Concat(new ObjectCommandSource(help.GetType(), () => help));
+            command.CommandSource = command.CommandSource.Concat(new ObjectCommandSource(null, help.GetType(), () => help));
             help.Command = command;
             return command;
         }

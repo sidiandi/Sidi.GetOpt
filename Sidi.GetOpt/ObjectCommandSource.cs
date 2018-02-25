@@ -11,7 +11,7 @@ namespace Sidi.GetOpt
     {
         private readonly Type type;
 
-        public ObjectCommandSource(Type type, Func<object> getInstance)
+        public ObjectCommandSource(ICommand parent, Type type, Func<object> getInstance)
         {
             if (getInstance == null)
             {
@@ -19,8 +19,13 @@ namespace Sidi.GetOpt
             }
 
             Options = Option.GetOptions(type, getInstance).ToList();
-            Commands = Command.GetCommands(type, getInstance, Options).ToList();
+            Commands = Command.GetCommands(parent, type, getInstance, Options).ToList();
             this.type = type ?? throw new ArgumentNullException(nameof(type));
+        }
+
+        public ObjectCommandSource(ICommand parent, object instance)
+            : this(parent, instance.GetType(), () => instance)
+        {
         }
 
         class NoCommand

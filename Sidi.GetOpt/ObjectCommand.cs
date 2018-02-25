@@ -9,12 +9,7 @@ namespace Sidi.GetOpt
 {
     class ObjectCommand : ICommand
     {
-        public static ICommand Create(string name, Type type, Func<object> getInstance)
-        {
-            return new ObjectCommand(name, new ObjectCommandSource(type, getInstance)).AddHelp();
-        }
-
-        public static ICommand Create(MemberInfo member, Func<object> getInstance)
+        public static ICommand Create(ICommand parent, MemberInfo member, Func<object> getInstance)
         {
             var getter = member.GetGetter(getInstance);
 
@@ -26,17 +21,19 @@ namespace Sidi.GetOpt
 
             var name = Util.CSharpIdentifierToLongOption(member.Name);
 
-            return new ObjectCommand(name, new ObjectCommandSource(member.GetValueType(), getter)).AddHelp();
+            var c = new ObjectCommand(parent, name);
+            c.CommandSource = new ObjectCommandSource(c, member.GetValueType(), getter);
+            return c.AddHelp();
         }
 
-        ObjectCommand(string name, ICommandSource commandSource)
+        public ObjectCommand(ICommand parent, string name)
         {
             if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
             Name = name;
-            CommandSource = commandSource;
+            Parent = parent;
         }
 
         public string Name { get; }
@@ -145,7 +142,6 @@ namespace Sidi.GetOpt
                 {
                     throw new ParseError(args, String.Format("This option requires a value. Specify with --{0}=value.", option.Name));
                 }
-                valueText = args.Current;
             }
 
             option.Set(valueText);
@@ -247,7 +243,7 @@ namespace Sidi.GetOpt
                 var c = CommandSource.Commands.SingleOrDefault();
                 if (c == null)
                 {
-                    c = MethodCommand.Create(() => this, this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
+                    c = MethodCommand.Create(null, () => this, this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
                 }
                 return c;
             }
@@ -261,13 +257,15 @@ namespace Sidi.GetOpt
 
         public string ArgumentSyntax => throw new NotImplementedException();
 
+        public ICommand Parent { get; }
+
         public void PrintUsage(TextWriter w)
         {
             if (MultiCommand)
             {
                 w.WriteLine(new[]
                 {
-                    @"Usage: " + this.Name + @" [option]... <command>",
+                    @"Usage: " + this.GetInvocation() + @" [option]... <command>",
                     this.Description,
                     CommandSynopsis,
                     OptionSynopsis
@@ -277,7 +275,7 @@ namespace Sidi.GetOpt
             {
                 w.WriteLine(new[]
                 {
-                    @"Usage: " + this.Name + @" [option]... " + SingleCommand.ArgumentSyntax,
+                    @"Usage: " + this.GetInvocation() + @" [option]... " + SingleCommand.ArgumentSyntax,
                     this.Description,
                     OptionSynopsis
                 }.JoinNonEmpty(endl+endl));

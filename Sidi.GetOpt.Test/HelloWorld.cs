@@ -35,6 +35,9 @@ namespace Sidi.GetOpt.Test
         [Description("B option")]
         public bool Bravo { get; set; }
 
+        [Description("D option")]
+        public bool Delta { get; set; }
+
         [Description("Output file")]
         public string Output { get; set; }
     }

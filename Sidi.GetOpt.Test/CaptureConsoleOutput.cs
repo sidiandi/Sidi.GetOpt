@@ -17,8 +17,8 @@ namespace Sidi.GetOpt.Test
         TextWriter originalOutput;
         TextWriter originalError;
 
-        TextWriter output = new StringWriter();
-        TextWriter error = new StringWriter();
+        public TextWriter output = new StringWriter();
+        public TextWriter error = new StringWriter();
 
         public void Dispose()
         {

@@ -54,20 +54,20 @@ namespace Sidi.GetOpt.Test
         {
             {
                 var hw = new HelloWorld();
-                var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "-abc" });
+                var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "-bcd" });
                 Assert.AreEqual(0, exitCode);
                 Assert.AreEqual(1, hw.Cordiality);
-                Assert.AreEqual(true, hw.Alpha);
                 Assert.AreEqual(true, hw.Bravo);
+                Assert.AreEqual(true, hw.Delta);
             }
 
             {
                 var hw = new HelloWorld();
-                var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "-a", "-b", "-c" });
+                var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "-b", "-c", "-d" });
                 Assert.AreEqual(0, exitCode);
                 Assert.AreEqual(1, hw.Cordiality);
-                Assert.AreEqual(true, hw.Alpha);
                 Assert.AreEqual(true, hw.Bravo);
+                Assert.AreEqual(true, hw.Delta);
             }
         }
 

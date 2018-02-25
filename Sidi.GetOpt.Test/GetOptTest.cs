@@ -73,6 +73,14 @@ namespace Sidi.GetOpt.Test
         }
 
         [Test]
+        public void ShowVersion()
+        {
+            var calc = new Calculator();
+            var e = GetOpt.Run(calc, new[] { "--version" });
+            Assert.AreEqual(0, e);
+        }
+
+        [Test]
         public void ShowHelpOptionStyle()
         {
             var h = new HelloWorld();
@@ -84,8 +92,20 @@ namespace Sidi.GetOpt.Test
         public void ShowHelpForCommand()
         {
             var calc = new Calculator();
-            var e = GetOpt.Run(calc, new[] { "sum", "--help"});
-            Assert.AreEqual(0, e);
+            using (var c = new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(calc, new[] { "sum", "--help" });
+                Assert.AreEqual(0, e);
+                Assert.AreEqual(@"Usage: Sidi.GetOpt.Test sum [option]... [a: Double]...
+
+Add numbers
+
+Options:
+--help : Show this help message
+--print : Print results
+"
+                , c.output.ToString());
+            }
         }
 
         [Test]
