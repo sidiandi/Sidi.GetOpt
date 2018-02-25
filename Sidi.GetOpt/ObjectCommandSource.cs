@@ -18,7 +18,7 @@ namespace Sidi.GetOpt
                 throw new ArgumentNullException(nameof(getInstance));
             }
 
-            Options = Option.GetOptions(getInstance).ToList();
+            Options = Option.GetOptions(getInstance);
             Commands = Command.GetCommands(parent, getInstance, Options).ToList();
             this.getInstance = getInstance;
         }

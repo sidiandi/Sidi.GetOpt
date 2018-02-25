@@ -107,12 +107,20 @@ namespace Sidi.GetOpt.Test
         [Test]
         public void ShowHelpForCommand()
         {
-            var calc = new Calculator();
+            var cmds = new Commands();
             using (var c = new CaptureConsoleOutput())
             {
-                var e = GetOpt.Run(calc, new[] { "sum", "--help" });
+                var e = GetOpt.Run(cmds, new string[] { });
+            }
+
+            using (var c = new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(cmds, new[] { "calculator", "sum", "--help" });
+                StringAssert.Contains("Usage: Sidi.GetOpt.Test calculator sum [option]... [a: Double]...", c.output.ToString());
+                StringAssert.Contains("--version : Show version information", c.output.ToString());
                 Assert.AreEqual(0, e);
-                Assert.AreEqual(@"Usage: Sidi.GetOpt.Test sum [option]... [a: Double]...
+                /*
+                Assert.AreEqual(@"Usage: Sidi.GetOpt.Test calculator sum [option]... [a: Double]...
 
 Add numbers
 
@@ -121,6 +129,7 @@ Options:
 --print : Print results
 "
                 , c.output.ToString());
+                */
             }
         }
 

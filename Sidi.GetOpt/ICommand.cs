@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Sidi.GetOpt
 {
@@ -7,6 +8,7 @@ namespace Sidi.GetOpt
         int Invoke(Args args);
         string Name { get; }
         ICommand Parent { get; }
+        IEnumerable<IOption> Options { get; }
         void PrintUsage(TextWriter w);
         string Description { get; }
         string ArgumentSyntax { get; }

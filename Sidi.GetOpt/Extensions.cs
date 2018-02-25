@@ -254,5 +254,19 @@ namespace Sidi.GetOpt
 
             public object Instance => GetGetter(member, containingObjectProvider.Instance).Instance;
         }
+
+        public static IEnumerable<T> DistinctBy<T, K>(this IEnumerable<T> e, Func<T, K> map)
+        {
+            var seen = new HashSet<K>();
+            foreach (var i in e)
+            {
+                var k = map(i);
+                if (!seen.Contains(k))
+                {
+                    seen.Add(k);
+                    yield return i;
+                }
+            }
+        }
     }
 }

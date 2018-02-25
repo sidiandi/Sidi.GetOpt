@@ -82,7 +82,7 @@ namespace Sidi.GetOpt
                 var name = optionText.Substring(0, 1);
                 var valueText = optionText.Substring(1);
 
-                var option = this.CommandSource.Options.FindShortOption(args, name);
+                var option = Options.FindShortOption(args, name);
 
                 if (option.Type.Equals(typeof(bool)))
                 {
@@ -106,7 +106,6 @@ namespace Sidi.GetOpt
             return true;
         }
 
-        IEnumerable<IOption> options => CommandSource.Options;
         IEnumerable<ICommand> commands => CommandSource.Commands;
 
         bool LongOption(Args args)
@@ -126,7 +125,7 @@ namespace Sidi.GetOpt
             var name = p.First();
             var valueText = p.Length == 2 ? p[1] : null;
 
-            var option = this.CommandSource.Options.FindLongOption(args);
+            var option = this.Options.FindLongOption(args);
 
             if (option.Type.Equals(typeof(bool)))
             {
@@ -231,9 +230,9 @@ namespace Sidi.GetOpt
             get
 
             {
-                if (this.CommandSource.Options.Any())
+                if (this.Options.Any())
                 {
-                    return "Options:" + endl + String.Join(endl, this.CommandSource.Options) + endl;
+                    return "Options:" + endl + String.Join(endl, this.Options) + endl;
                 }
                 else
                 {
@@ -250,7 +249,7 @@ namespace Sidi.GetOpt
                 var c = CommandSource.Commands.SingleOrDefault();
                 if (c == null)
                 {
-                    c = MethodCommand.Create(null, new ObjectProvider(this.GetType(), () => this), this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
+                    c = MethodCommand.Create(null, new ObjectProvider(this.GetType(), () => this), this.GetType().GetMethod("Nothing"), this.Options);
                 }
                 return c;
             }
@@ -265,6 +264,10 @@ namespace Sidi.GetOpt
         public string ArgumentSyntax => throw new NotImplementedException();
 
         public ICommand Parent { get; }
+
+        public IEnumerable<IOption> Options =>
+            this.CommandSource.Options.Concat(this.Parent == null ? Enumerable.Empty<IOption>() : this.Parent.Options)
+            .DistinctBy(_ => _.Name);
 
         public void PrintUsage(TextWriter w)
         {

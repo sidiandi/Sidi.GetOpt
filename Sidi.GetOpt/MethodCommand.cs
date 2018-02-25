@@ -96,7 +96,7 @@ namespace Sidi.GetOpt
                 var name = optionText.Substring(0, 1);
                 var valueText = optionText.Substring(1);
 
-                var option = this.options.FindShortOption(args, name);
+                var option = this.Options.FindShortOption(args, name);
 
                 if (option.Type.Equals(typeof(bool)))
                 {
@@ -119,7 +119,6 @@ namespace Sidi.GetOpt
             return true;
         }
 
-        private readonly IEnumerable<IOption> options;
         private readonly IEnumerable<IOption> inheritedOptions;
         ParameterInfo[] parameterInfo;
         int result;
@@ -147,7 +146,7 @@ namespace Sidi.GetOpt
             var name = p.First();
             var valueText = p.Length == 2 ? p[1] : null;
 
-            var option = this.options.FindLongOption(args);
+            var option = this.Options.FindLongOption(args);
 
             if (option.Type.Equals(typeof(bool)))
             {
@@ -182,7 +181,7 @@ namespace Sidi.GetOpt
             return Parameter(args);
         }
 
-        bool Options(Args args)
+        bool ParseOptions(Args args)
         {
             for (; ; )
             {
@@ -212,7 +211,7 @@ namespace Sidi.GetOpt
                 return ArrayParameter(args);
             }
 
-            Options(args);
+            ParseOptions(args);
 
             if (!args.HasNext)
             {
@@ -234,7 +233,7 @@ namespace Sidi.GetOpt
 
             for (; ; )
             {
-                Options(args);
+                ParseOptions(args);
                 if (!args.HasNext) break;
                 args.MoveNext();
                 items.Add(Util.ParseValue(getInstance.Instance, elementType, args.Current));
@@ -251,9 +250,9 @@ namespace Sidi.GetOpt
             get
 
             {
-                if (options.Any())
+                if (Options.Any())
                 {
-                    return "Options:" + endl + String.Join(endl, options) + endl;
+                    return "Options:" + endl + String.Join(endl, Options) + endl;
                 }
                 else
                 {
@@ -263,6 +262,9 @@ namespace Sidi.GetOpt
         }
 
         public ICommand Parent { get; }
+
+        public IEnumerable<IOption> Options => inheritedOptions.Concat(this.Parent.Options)
+            .DistinctBy(_ => _.Name);
 
         public void PrintUsage(TextWriter w)
         {
@@ -285,7 +287,6 @@ namespace Sidi.GetOpt
             this.method = method ?? throw new ArgumentNullException(nameof(method));
             this.parameterInfo = method.GetParameters();
             this.inheritedOptions = inheritedOptions ?? Enumerable.Empty<IOption>();
-            this.options = this.inheritedOptions;
             this.Parent = parent;
         }
     }
