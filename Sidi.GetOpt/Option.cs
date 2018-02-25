@@ -9,10 +9,13 @@ namespace Sidi.GetOpt
     abstract class Option : IOption
     {
         public abstract Type Type { get; }
+
+        public abstract IEnumerable<string> Aliases { get;  }
+
         public string Name { get; protected set; }
         public abstract string Description { get; }
 
-        public static IOption Create(Func<object> getInstance, MemberInfo member)
+        public static IOption Create(IObjectProvider getInstance, MemberInfo member)
         {
             if (getInstance == null)
             {
@@ -37,18 +40,18 @@ namespace Sidi.GetOpt
 
             if (member is FieldInfo)
             {
-                return (IOption)new FieldOption(getInstance, (FieldInfo)member);
+                return (IOption) new FieldOption(getInstance, (FieldInfo)member);
             }
             else if (member is PropertyInfo)
             {
-                return (IOption)new PropertyOption(getInstance, (PropertyInfo)member);
+                return (IOption) new PropertyOption(getInstance, (PropertyInfo)member);
             }
             throw new NotSupportedException(String.Format("{0} of type {1} is not supported.", member, member.GetType()));
         }
 
-        public static IEnumerable<IOption> GetOptions(Type type, Func<object> getInstance)
+        public static IEnumerable<IOption> GetOptions(IObjectProvider getInstance)
         {
-            return type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static)
+            return getInstance.Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static)
                 .Select(_ => Option.Create(getInstance, _))
                 .Where(_ => _ != null)
                 .ToList();
@@ -62,20 +65,28 @@ namespace Sidi.GetOpt
         {
             if (NeedsValue)
             {
-                return String.Format("--{0}={2} : {1}", this.Name, this.Description, this.Type.Name);
+                return String.Format(
+                    Aliases.Where(_ => _.Length == 1).Select(_ => String.Format("-{0}{1}", _, this.Type.Name))
+                    .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}={1}", _, this.Type.Name)))
+                    .JoinNonEmpty("|")
+                    + " : " + this.Description);
             }
             else
             {
-                return String.Format("--{0} : {1}", this.Name, this.Description);
+                return String.Format(
+                    Aliases.Where(_ => _.Length == 1).Select(_ => String.Format("-{0}", _, this.Type.Name))
+                    .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}", _, this.Type.Name)))
+                    .JoinNonEmpty("|")
+                    + " : " + this.Description);
             }
         }
 
         class FieldOption : Option
         {
-            private readonly Func<object> getInstance;
+            private readonly IObjectProvider getInstance;
             private readonly FieldInfo field;
 
-            public FieldOption(Func<object> getInstance, FieldInfo field)
+            public FieldOption(IObjectProvider getInstance, FieldInfo field)
             {
                 this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
                 this.field = field ?? throw new ArgumentNullException(nameof(field));
@@ -84,11 +95,13 @@ namespace Sidi.GetOpt
 
             public override Type Type => field.FieldType;
 
+            public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.field.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
+
             public override string Description => field.GetUsage();
 
             public override void Set(string value)
             {
-                field.SetValue(this.getInstance(), Util.ParseValue(getInstance(), this.Type, value));
+                field.SetValue(this.getInstance.Instance, Util.ParseValue(getInstance.Instance, this.Type, value));
             }
 
             public override string ToString()
@@ -99,10 +112,10 @@ namespace Sidi.GetOpt
 
         class PropertyOption : Option
         {
-            private readonly Func<object> getInstance;
+            private readonly IObjectProvider getInstance;
             private readonly PropertyInfo property;
 
-            public PropertyOption(Func<object> getInstance, PropertyInfo property)
+            public PropertyOption(IObjectProvider getInstance, PropertyInfo property)
             {
                 this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
                 this.property = property ?? throw new ArgumentNullException(nameof(property));
@@ -111,14 +124,15 @@ namespace Sidi.GetOpt
 
             public override Type Type => property.PropertyType;
 
+            public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.property.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
+
             public override string Description => property.GetUsage();
 
             public override void Set(string value)
             {
                 try
                 {
-                    var instance = getInstance();
-                    property.SetValue(instance, Util.ParseValue(instance, this.Type, value));
+                    property.SetValue(getInstance.Instance, Util.ParseValue(getInstance.Instance, this.Type, value));
                 }
                 catch (System.Reflection.TargetException ex)
                 {

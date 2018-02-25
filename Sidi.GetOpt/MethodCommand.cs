@@ -9,7 +9,7 @@ namespace Sidi.GetOpt
 {
     class MethodCommand : ICommand
     {
-        private readonly Func<object> getInstance;
+        private readonly IObjectProvider getInstance;
         private readonly MethodInfo method;
 
         public string Name => Util.CSharpIdentifierToLongOption(method.Name);
@@ -20,7 +20,7 @@ namespace Sidi.GetOpt
 
         public string ArgumentSyntax => this.method.GetArgumentSyntax();
 
-        public static ICommand Create(ICommand parent, Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
+        public static ICommand Create(ICommand parent, IObjectProvider containingObject, MethodInfo method, IEnumerable<IOption> inheritedOptions)
         {
             if (inheritedOptions == null)
             {
@@ -31,9 +31,9 @@ namespace Sidi.GetOpt
             if (description == null) return null;
 
             var help = new HelpOption();
-            var helpCommand = new ObjectCommandSource(null, help.GetType(), () => help);
+            var helpCommand = new ObjectCommandSource(null, ObjectProvider.Create(help));
 
-            var c = new MethodCommand(parent, getInstance, method, helpCommand.Options.Concat(inheritedOptions));
+            var c = new MethodCommand(parent, containingObject, method, helpCommand.Options.Concat(inheritedOptions));
 
             help.Command = c;
             return c;
@@ -199,7 +199,7 @@ namespace Sidi.GetOpt
             if (args.parameters.Count >= parameterInfo.Length)
             {
                 // execute method - enough parameters
-                var instance = getInstance();
+                var instance = getInstance.Instance;
                 var r = this.method.Invoke(instance, args.parameters.ToArray());
                 result = r is int ? (int)r : 0;
                 return false;
@@ -221,7 +221,7 @@ namespace Sidi.GetOpt
 
             args.MoveNext();
 
-            args.parameters.Add(Util.ParseValue(getInstance(), expectedType, args.Current));
+            args.parameters.Add(Util.ParseValue(getInstance.Instance, expectedType, args.Current));
             return true;
         }
 
@@ -237,7 +237,7 @@ namespace Sidi.GetOpt
                 Options(args);
                 if (!args.HasNext) break;
                 args.MoveNext();
-                items.Add(Util.ParseValue(getInstance(), elementType, args.Current));
+                items.Add(Util.ParseValue(getInstance.Instance, elementType, args.Current));
             }
 
             args.parameters.Add(items.ToArray(elementType));
@@ -279,7 +279,7 @@ namespace Sidi.GetOpt
             return String.Format("{0} : {1}", this.Name, this.Description);
         }
 
-        MethodCommand(ICommand parent, Func<object> getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
+        MethodCommand(ICommand parent, IObjectProvider getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)
         {
             this.getInstance = getInstance ?? throw new ArgumentNullException(nameof(getInstance));
             this.method = method ?? throw new ArgumentNullException(nameof(method));

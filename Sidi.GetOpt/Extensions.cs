@@ -160,6 +160,12 @@ namespace Sidi.GetOpt
             return a == null ? null : a.Description;
         }
 
+        public static string GetUsage(this IObjectProvider p)
+        {
+            var a = p.Type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            return a == null ? null : a.Description;
+        }
+
         public static Type GetValueType(this MemberInfo member)
         {
             if (member is PropertyInfo)
@@ -176,17 +182,17 @@ namespace Sidi.GetOpt
             }
         }
 
-        public static Func<object> GetGetter(this MemberInfo member, object containingObject)
+        public static IObjectProvider GetGetter(this MemberInfo member, object containingObject)
         {
             if (member is PropertyInfo)
             {
                 var property = (PropertyInfo)member;
-                return new Func<object>(() => property.GetValue(containingObject));
+                return new ObjectProvider(property.PropertyType, () => property.GetValue(containingObject));
             }
             else if (member is FieldInfo)
             {
                 var field = (FieldInfo)member;
-                return new Func<object>(() => field.GetValue(containingObject));
+                return new ObjectProvider(field.FieldType, () => field.GetValue(containingObject));
             }
             else
             {
@@ -194,11 +200,9 @@ namespace Sidi.GetOpt
             }
         }
 
-        public static Func<object> GetGetter(this MemberInfo member, Func<object> containingObjectGetter)
+        public static IObjectProvider GetGetter(this MemberInfo member, IObjectProvider containingObjectProvider)
         {
-            var cog = containingObjectGetter;
-            var m = member;
-            return () => m.GetGetter(cog())();
+            return new MemberGetter(member, containingObjectProvider);
         }
 
         static string GetArgumentSyntax(this ParameterInfo _)
@@ -233,6 +237,22 @@ namespace Sidi.GetOpt
         public static string GetSummary(this ICommand command)
         {
             return String.Format("{0} : {1}", command.Name, command.Description);
+        }
+
+        private class MemberGetter : IObjectProvider
+        {
+            private MemberInfo member;
+            private IObjectProvider containingObjectProvider;
+
+            public MemberGetter(MemberInfo member, IObjectProvider containingObjectProvider)
+            {
+                this.member = member;
+                this.containingObjectProvider = containingObjectProvider;
+            }
+
+            public Type Type => member.GetValueType();
+
+            public object Instance => GetGetter(member, containingObjectProvider.Instance).Instance;
         }
     }
 }

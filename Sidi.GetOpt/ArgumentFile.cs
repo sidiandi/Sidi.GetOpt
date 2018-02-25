@@ -11,6 +11,12 @@ namespace Sidi.GetOpt
     {
         public static IEnumerable<string> Read(TextReader r)
         {
+            return ReadImpl(r).ToList();
+        }
+
+
+        static IEnumerable<string> ReadImpl(TextReader r)
+        {
             for (; ; )
             {
                 if (!ConsumeWhitespace(r)) break;

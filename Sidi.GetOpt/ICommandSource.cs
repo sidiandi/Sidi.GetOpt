@@ -84,7 +84,9 @@ namespace Sidi.GetOpt
                 return null;
             }
 
-            var option = GetSingle(args, options.Where(_ => _.Name.Equals(optionName)));
+            var option = GetSingle(args, options.Where(_ => _.Aliases.Any(alias => alias.Equals(optionName))));
+            if (option != null) return option;
+            option = GetSingle(args, options.Where(_ => _.Aliases.Any(alias => alias.StartsWith(optionName, StringComparison.InvariantCultureIgnoreCase))));
             if (option != null) return option;
             option = GetSingle(args, options.Where(_ => optionName.IsAbbreviation(_.Name)));
             if (option != null) return option;
@@ -98,7 +100,7 @@ namespace Sidi.GetOpt
                 return null;
             }
 
-            var option = GetSingle(args, options.Where(_ => _.Name.Equals(optionName)));
+            var option = GetSingle(args, options.Where(_ => _.Aliases.Any(alias => alias.Equals(optionName))));
             if (option != null) return option;
             option = GetSingle(args, options.Where(_ => optionName.IsAbbreviation(_.Name)));
             if (option != null) return option;

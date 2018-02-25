@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sidi.GetOpt
 {
@@ -7,7 +8,7 @@ namespace Sidi.GetOpt
         Type Type { get; }
         string Name { get; }
         string Description { get; }
-
         void Set(string value);
+        IEnumerable<string> Aliases { get; }
     }
 }

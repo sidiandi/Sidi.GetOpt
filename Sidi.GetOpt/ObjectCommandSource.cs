@@ -9,23 +9,18 @@ namespace Sidi.GetOpt
 {
     internal class ObjectCommandSource : ICommandSource
     {
-        private readonly Type type;
+        private readonly IObjectProvider getInstance;
 
-        public ObjectCommandSource(ICommand parent, Type type, Func<object> getInstance)
+        public ObjectCommandSource(ICommand parent, IObjectProvider getInstance)
         {
             if (getInstance == null)
             {
                 throw new ArgumentNullException(nameof(getInstance));
             }
 
-            Options = Option.GetOptions(type, getInstance).ToList();
-            Commands = Command.GetCommands(parent, type, getInstance, Options).ToList();
-            this.type = type ?? throw new ArgumentNullException(nameof(type));
-        }
-
-        public ObjectCommandSource(ICommand parent, object instance)
-            : this(parent, instance.GetType(), () => instance)
-        {
+            Options = Option.GetOptions(getInstance).ToList();
+            Commands = Command.GetCommands(parent, getInstance, Options).ToList();
+            this.getInstance = getInstance;
         }
 
         class NoCommand
@@ -38,7 +33,7 @@ namespace Sidi.GetOpt
 
         public IEnumerable<IOption> Options { get; }
 
-        public string Description => type.GetUsage();
+        public string Description => getInstance.GetUsage();
 
         public object ParseValue(Type type, string value)
         {

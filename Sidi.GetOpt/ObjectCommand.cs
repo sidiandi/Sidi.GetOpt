@@ -9,9 +9,9 @@ namespace Sidi.GetOpt
 {
     class ObjectCommand : ICommand
     {
-        public static ICommand Create(ICommand parent, MemberInfo member, Func<object> getInstance)
+        public static ICommand Create(ICommand parent, MemberInfo member, IObjectProvider containingObject)
         {
-            var getter = member.GetGetter(getInstance);
+            var getter = member.GetGetter(containingObject);
 
             var command = member.GetCustomAttribute<CommandAttribute>();
             if (command == null)
@@ -22,7 +22,7 @@ namespace Sidi.GetOpt
             var name = Util.CSharpIdentifierToLongOption(member.Name);
 
             var c = new ObjectCommand(parent, name);
-            c.CommandSource = new ObjectCommandSource(c, member.GetValueType(), getter);
+            c.CommandSource = new ObjectCommandSource(c, getter);
             return c.AddHelp();
         }
 
@@ -97,6 +97,7 @@ namespace Sidi.GetOpt
                         args.MoveNext();
                         valueText = args.Current;
                     }
+                    optionText = null;
                 }
 
                 option.Set(valueText);
@@ -191,6 +192,12 @@ namespace Sidi.GetOpt
 
         public int Invoke(Args args)
         {
+            if (!args.HasNext && this.MultiCommand)
+            {
+                // No args in multi-command mode? Show help!
+                args.Insert(new[] { "--help" });
+            }
+
             for (; args.HasNext;)
             {
                 if (!Parse(args))
@@ -243,7 +250,7 @@ namespace Sidi.GetOpt
                 var c = CommandSource.Commands.SingleOrDefault();
                 if (c == null)
                 {
-                    c = MethodCommand.Create(null, () => this, this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
+                    c = MethodCommand.Create(null, new ObjectProvider(this.GetType(), () => this), this.GetType().GetMethod("Nothing"), this.CommandSource.Options);
                 }
                 return c;
             }
@@ -268,7 +275,8 @@ namespace Sidi.GetOpt
                     @"Usage: " + this.GetInvocation() + @" [option]... <command>",
                     this.Description,
                     CommandSynopsis,
-                    OptionSynopsis
+                    OptionSynopsis,
+                    @"Help for a single command: " + this.GetInvocation() + @" <command> --help",
                 }.JoinNonEmpty(endl + endl));
             }
             else

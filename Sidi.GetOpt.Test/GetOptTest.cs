@@ -68,8 +68,24 @@ namespace Sidi.GetOpt.Test
         public void ShowHelp()
         {
             var calc = new Calculator();
-            var e = GetOpt.Run(calc, new[] { "--help" });
-            Assert.AreEqual(0, e);
+            using (var c = new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(calc, new[] { "--help" });
+                Assert.AreEqual(0, e);
+                Assert.IsTrue(c.output.ToString().StartsWith("Usage:"));
+            }
+        }
+
+        [Test]
+        public void ShowHelpIfNoArgumentsInMultiCommandMode()
+        {
+            var calc = new Calculator();
+            using (var c = new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(calc, new string[] { });
+                Assert.AreEqual(0, e);
+                Assert.IsTrue(c.output.ToString().StartsWith("Usage:"));
+            }
         }
 
         [Test]
@@ -101,7 +117,7 @@ namespace Sidi.GetOpt.Test
 Add numbers
 
 Options:
---help : Show this help message
+-h|--help : Show this help message
 --print : Print results
 "
                 , c.output.ToString());

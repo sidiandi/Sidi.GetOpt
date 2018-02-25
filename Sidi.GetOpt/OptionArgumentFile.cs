@@ -14,7 +14,7 @@ namespace Sidi.GetOpt
             this.args = args ?? throw new ArgumentNullException(nameof(args));
         }
 
-        [Description("Add arguments from a file")]
+        [Description("Add arguments from a file"), Alias("@")]
         public string ArgumentFile
         {
             set

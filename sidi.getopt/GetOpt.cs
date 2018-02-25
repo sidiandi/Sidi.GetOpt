@@ -21,9 +21,9 @@ namespace Sidi.GetOpt
                 var entryAssembly = Assembly.GetCallingAssembly();
                 var programName = application.GetType().Assembly.GetName().Name;
                 var rootCommand = new ObjectCommand(null, programName);
-                var commandSource = new ObjectCommandSource(rootCommand, application).Concat(
-                    new ObjectCommandSource(rootCommand, new VersionOption(entryAssembly)), 
-                    new ObjectCommandSource(rootCommand, new OptionArgumentFile(a))
+                var commandSource = new ObjectCommandSource(rootCommand, ObjectProvider.Create(application)).Concat(
+                    new ObjectCommandSource(rootCommand, ObjectProvider.Create(new VersionOption(entryAssembly))), 
+                    new ObjectCommandSource(rootCommand, ObjectProvider.Create(new OptionArgumentFile(a)))
                     );
                 rootCommand.CommandSource = commandSource;
                 

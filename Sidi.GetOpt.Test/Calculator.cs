@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Sidi.GetOpt.Test
 {
+    [Description("Basic calculations")]
     internal class Calculator
     {
         public Calculator() { }
