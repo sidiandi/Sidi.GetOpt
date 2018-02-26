@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Sidi.GetOpt
 {
@@ -9,7 +8,7 @@ namespace Sidi.GetOpt
         {
         }
 
-        [Description("Show this help message"), Alias("h")]
+        [Usage("Show this help message"), Alias("h")]
         public bool Help { set { Command.PrintUsage(Console.Out);  } }
 
         public ICommand Command { get; set; }

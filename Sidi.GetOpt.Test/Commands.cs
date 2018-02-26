@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-
+﻿
 namespace Sidi.GetOpt.Test
 {
     internal class Commands
@@ -10,10 +9,10 @@ namespace Sidi.GetOpt.Test
             Hello = new HelloWorld();
         }
 
-        [Command, Description("Greet people")]
+        [Command, Usage("Greet people")]
         public HelloWorld Hello;
 
-        [Command, Description("Basic calculations")]
+        [Command, Usage("Basic calculations")]
         public Calculator Calculator;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.ComponentModel;
 using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace Sidi.GetOpt
 
         public MethodInfo Method => this.method;
 
-        public string Description => this.method.GetDescription();
+        public string Usage => this.method.GetUsage();
 
         public string ArgumentSyntax => this.method.GetArgumentSyntax();
 
@@ -27,8 +26,8 @@ namespace Sidi.GetOpt
                 throw new ArgumentNullException(nameof(inheritedOptions));
             }
 
-            var description = method.GetCustomAttribute<DescriptionAttribute>();
-            if (description == null) return null;
+            var usage = method.GetUsage();
+            if (usage == null) return null;
 
             var help = new HelpOption();
             var helpCommand = new ObjectCommandSource(null, ObjectProvider.Create(help));
@@ -271,14 +270,14 @@ namespace Sidi.GetOpt
             w.WriteLine(new[]
             {
                 @"Usage: " + this.GetInvocation() + @" [option]... " + this.method.GetArgumentSyntax(),
-                this.Description,
+                this.Usage,
                 OptionSynopsis
             }.JoinNonEmpty(endl + endl));
         }
 
         public override string ToString()
         {
-            return String.Format("{0} : {1}", this.Name, this.Description);
+            return String.Format("{0} : {1}", this.Name, this.Usage);
         }
 
         MethodCommand(ICommand parent, IObjectProvider getInstance, MethodInfo method, IEnumerable<IOption> inheritedOptions)

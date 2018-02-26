@@ -7,7 +7,7 @@ namespace Sidi.GetOpt
     {
         Type Type { get; }
         string Name { get; }
-        string Description { get; }
+        string Usage { get; }
         void Set(string value);
         IEnumerable<string> Aliases { get; }
     }

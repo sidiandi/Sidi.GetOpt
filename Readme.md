@@ -9,36 +9,40 @@ Install package via nuget
 nuget install-package Sidi.GetOpt
 ````
 
-Decorate your classes, fields, properties, and methods with the [Description]() attribute.
-````
-// Decorate a class with the Description attribute to add a usage message
-[Description(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
+Decorate your classes, fields, properties, and methods with the Usage attribute.
+````C#
+// Decorate a class with the Usage attribute to add a usage message
+[Usage(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
 class Example
 {
-	static void Main(string[] args)
-	{
-		// Add this line to Main to start command line parsing
-		GetOpt.Run(new Example(), args);
-	}
+    static int Main(string[] args)
+    {
+        // Add this line to Main to start command line parsing
+        return GetOpt.Run(new Example(), args);
+    }
 
-	// Decorate fields with the Description attribute to turn them into options.
-	[Description("Increase verbosity")]
-	bool Verbose = false;
+    // Decorate fields with the Usage attribute to turn them into options.
+    [Usage("Increase verbosity")]
+    bool Verbose = false;
 
-	// Decorate properties with the Description attribute to turn them into options.
-	[Description("Wait time in seconds")]
-	Double Time { get; set; }
+    // Decorate properties with the Usage attribute to turn them into options.
+    [Usage("A number option")]
+    Double Number { get; set; }
 
-	// Decorate methods with the Description attribute to turn them into commands.
-	[Description("Wait a little bit")]
-	public void Wait()
-	{
-		Console.WriteLine("Wait for {0} seconds", Time);
-	}
+    // Decorate methods with the Usage attribute to turn them into commands.
+    [Usage("Wait")]
+    public void Wait(int seconds)
+    {
+        if (Verbose)
+        {
+            Console.WriteLine("Waiting for {0} seonds", seconds);
+        }
+        Thread.Sleep(TimeSpan.FromSeconds(seconds));
+    }
 
-	// Decorate properties or fields with the Command attribute to turn them into sub-commands.
-	[Command]
-	Calculate Calculate = new Calculate();
+    // Decorate properties or fields with the Command attribute to turn them into sub-commands.
+    [Command]
+    Calculate Calculate = new Calculate();
 }
 ````
 
@@ -60,12 +64,12 @@ Options:
 ````
 
 ## Todo
-- parameter files
-- version info
 - built-in value parsers for TimeSpan, DateTime, TextReader
 - extensible value parsers
 
 ## Done
+- version info
+- parameter files
 - Command Objects
 - help
 - abbreviations of commands and options

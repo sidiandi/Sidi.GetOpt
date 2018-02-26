@@ -1,7 +1,6 @@
 ﻿using Sidi.GetOpt;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace example
 {
-    [Description("Basic arithmetic operations")]
+    [Usage("Basic arithmetic operations")]
     class Calculate
     {
-        [Description("Add a and b and print the result.")]
+        [Usage("Add a and b and print the result.")]
         public void Add(double a, double b)
         {
             Console.WriteLine(a + b);
         }
 
-        [Description("multiply")]
+        [Usage("multiply")]
         public void Multiply(double a, double b)
         {
             Console.WriteLine(a * b);
@@ -28,8 +27,8 @@ namespace example
     }
 
 
-    // Decorate a class with the Description attribute to add a usage message
-    [Description(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
+    // Decorate a class with the Usage attribute to add a usage message
+    [Usage(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
     class Example
     {
         static int Main(string[] args)
@@ -38,16 +37,16 @@ namespace example
             return GetOpt.Run(new Example(), args);
         }
 
-        // Decorate fields with the Description attribute to turn them into options.
-        [Description("Increase verbosity")]
+        // Decorate fields with the Usage attribute to turn them into options.
+        [Usage("Increase verbosity")]
         bool Verbose = false;
 
-        // Decorate properties with the Description attribute to turn them into options.
-        [Description("A number option")]
+        // Decorate properties with the Usage attribute to turn them into options.
+        [Usage("A number option")]
         Double Number { get; set; }
 
-        // Decorate methods with the Description attribute to turn them into commands.
-        [Description("Wait")]
+        // Decorate methods with the Usage attribute to turn them into commands.
+        [Usage("Wait")]
         public void Wait(int seconds)
         {
             if (Verbose)

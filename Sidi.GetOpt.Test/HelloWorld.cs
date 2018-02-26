@@ -1,11 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Sidi.GetOpt.Test
 {
     public class HelloWorld
     {
-        [Description("Greets all names.")] 
+        [Usage("Greets all names.")] 
         public void Greet(params string[] name)
         {
             foreach (var i in name)
@@ -24,21 +23,21 @@ namespace Sidi.GetOpt.Test
 
         public string LastGreeted { get; private set; }
 
-        [Description("Greet cordially")] 
+        [Usage("Greet cordially")] 
         public bool Cordially { set { ++Cordiality; } }
 
         public int Cordiality { get; set; }
 
-        [Description("A option")]
+        [Usage("A option")]
         public bool Alpha { get; set; }
 
-        [Description("B option")]
+        [Usage("B option")]
         public bool Bravo { get; set; }
 
-        [Description("D option")]
+        [Usage("D option")]
         public bool Delta { get; set; }
 
-        [Description("Output file")]
+        [Usage("Output file")]
         public string Output { get; set; }
     }
 }

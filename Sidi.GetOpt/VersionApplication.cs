@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +10,7 @@ namespace Sidi.GetOpt
 {
     class VersionApplication
     {
-        [Description("Show version information.")]
+        [Usage("Show version information.")]
         public bool Version
         {
             set

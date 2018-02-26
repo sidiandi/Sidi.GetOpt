@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace Sidi.GetOpt
@@ -14,7 +13,7 @@ namespace Sidi.GetOpt
             this.args = args ?? throw new ArgumentNullException(nameof(args));
         }
 
-        [Description("Add arguments from a file"), Alias("@")]
+        [Usage("Add arguments from a file"), Alias("@")]
         public string ArgumentFile
         {
             set

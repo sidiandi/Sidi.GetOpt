@@ -25,8 +25,8 @@
     <Compile Include="IObjectProvider.cs" />
     <Compile Include="ObjectProvider.cs" />
     <Compile Include="OptionArgumentFile.cs" />
+    <Compile Include="UsageAttribute.cs" />
     <Compile Include="VersionOption.cs" />
-    <None Include="CommandSource.cs" />
     <Compile Include="CompositeCommandSource.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GetOpt.cs" />

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Sidi.GetOpt.Test
 {
-    [Description("Basic calculations")]
+    [Usage("Basic calculations")]
     internal class Calculator
     {
         public Calculator() { }
@@ -27,19 +26,19 @@ namespace Sidi.GetOpt.Test
         }
         double result = 0.0;
 
-        [Description("Add two numbers")]
+        [Usage("Add two numbers")]
         public void Add(double a, double b)
         {
             Result = a + b;
         }
 
-        [Description("Add numbers")]
+        [Usage("Add numbers")]
         public void Sum(double[] a)
         {
             Result = a.Sum();
         }
 
-        [Description("Print results")]
+        [Usage("Print results")]
         public bool Print { get; set; }
     }
 }

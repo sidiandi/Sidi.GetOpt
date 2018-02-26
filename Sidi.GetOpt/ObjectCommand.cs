@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -40,12 +39,12 @@ namespace Sidi.GetOpt
 
         public override string ToString()
         {
-            return String.Format("{0} : {1}", this.Name, this.Description);
+            return String.Format("{0} : {1}", this.Name, this.Usage);
         }
 
         public ICommandSource CommandSource { get; set; }
 
-        public string Description => CommandSource.Description;
+        public string Usage => CommandSource.Usage;
 
         bool OptionStop(Args args)
         {
@@ -255,7 +254,7 @@ namespace Sidi.GetOpt
             }
         }
 
-        [Description("")]
+        [Usage("")]
         public void Nothing()
         {
 
@@ -276,7 +275,7 @@ namespace Sidi.GetOpt
                 w.WriteLine(new[]
                 {
                     @"Usage: " + this.GetInvocation() + @" [option]... <command>",
-                    this.Description,
+                    this.Usage,
                     CommandSynopsis,
                     OptionSynopsis,
                     @"Help for a single command: " + this.GetInvocation() + @" <command> --help",
@@ -287,7 +286,7 @@ namespace Sidi.GetOpt
                 w.WriteLine(new[]
                 {
                     @"Usage: " + this.GetInvocation() + @" [option]... " + SingleCommand.ArgumentSyntax,
-                    this.Description,
+                    this.Usage,
                     OptionSynopsis
                 }.JoinNonEmpty(endl+endl));
         }

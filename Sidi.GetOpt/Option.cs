@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -13,7 +12,7 @@ namespace Sidi.GetOpt
         public abstract IEnumerable<string> Aliases { get;  }
 
         public string Name { get; protected set; }
-        public abstract string Description { get; }
+        public abstract string Usage { get; }
 
         public static IOption Create(IObjectProvider getInstance, MemberInfo member)
         {
@@ -32,8 +31,8 @@ namespace Sidi.GetOpt
                 return null;
             }
 
-            var description = member.GetCustomAttribute<DescriptionAttribute>();
-            if (description == null) return null;
+            var usage = member.GetUsage();
+            if (usage == null) return null;
 
             var command = member.GetCustomAttribute<CommandAttribute>();
             if (command != null) return null;
@@ -69,7 +68,7 @@ namespace Sidi.GetOpt
                     Aliases.Where(_ => _.Length == 1).Select(_ => String.Format("-{0}{1}", _, this.Type.Name))
                     .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}={1}", _, this.Type.Name)))
                     .JoinNonEmpty("|")
-                    + " : " + this.Description);
+                    + " : " + this.Usage);
             }
             else
             {
@@ -77,7 +76,7 @@ namespace Sidi.GetOpt
                     Aliases.Where(_ => _.Length == 1).Select(_ => String.Format("-{0}", _, this.Type.Name))
                     .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}", _, this.Type.Name)))
                     .JoinNonEmpty("|")
-                    + " : " + this.Description);
+                    + " : " + this.Usage);
             }
         }
 
@@ -97,7 +96,7 @@ namespace Sidi.GetOpt
 
             public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.field.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
 
-            public override string Description => field.GetUsage();
+            public override string Usage => field.GetUsage();
 
             public override void Set(string value)
             {
@@ -106,7 +105,7 @@ namespace Sidi.GetOpt
 
             public override string ToString()
             {
-                return String.Format("--{0} : {1}", this.Name, this.Description);
+                return String.Format("--{0} : {1}", this.Name, this.Usage);
             }
         }
 
@@ -126,7 +125,7 @@ namespace Sidi.GetOpt
 
             public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.property.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
 
-            public override string Description => property.GetUsage();
+            public override string Usage => property.GetUsage();
 
             public override void Set(string value)
             {

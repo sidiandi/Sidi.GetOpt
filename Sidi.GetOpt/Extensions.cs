@@ -61,18 +61,18 @@ namespace Sidi.GetOpt
             return String.Join(separator, items.Where(_ => _ != null).Select(_ => _.Trim()).Where(_ => !String.IsNullOrEmpty(_)));
         }
 
-        public static string GetDescription(this Type type)
+        public static string GetUsage(this Type type)
         {
-            var da = type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            var da = type.GetCustomAttribute<UsageAttribute>();
             if (da == null) return null;
-            return da.Description;
+            return da.Usage;
         }
 
-        public static string GetDescription(this MemberInfo member)
+        public static string GetUsage(this MemberInfo member)
         {
-            var da = member.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+            var da = member.GetCustomAttribute<UsageAttribute>();
             if (da == null) return null;
-            return da.Description;
+            return da.Usage;
         }
 
         public static bool TryRemovePrefix(this string text, string prefix, out string textWithoutPrefix)
@@ -154,16 +154,9 @@ namespace Sidi.GetOpt
             return a;
         }
 
-        public static string GetUsage(this MemberInfo p)
-        {
-            var a = p.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
-            return a == null ? null : a.Description;
-        }
-
         public static string GetUsage(this IObjectProvider p)
         {
-            var a = p.Type.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
-            return a == null ? null : a.Description;
+            return p.Type.GetUsage();
         }
 
         public static Type GetValueType(this MemberInfo member)
@@ -226,17 +219,17 @@ namespace Sidi.GetOpt
         {
             if (option.Type.Equals(typeof(bool)))
             {
-                return String.Format("--{0} : {2}", option.Name, option.Type, option.Description);
+                return String.Format("--{0} : {2}", option.Name, option.Type, option.Usage);
             }
             else
             {
-                return String.Format("--{0}={1} : {2}", option.Name, option.Type, option.Description);
+                return String.Format("--{0}={1} : {2}", option.Name, option.Type, option.Usage);
             }
         }
 
         public static string GetSummary(this ICommand command)
         {
-            return String.Format("{0} : {1}", command.Name, command.Description);
+            return String.Format("{0} : {1}", command.Name, command.Usage);
         }
 
         private class MemberGetter : IObjectProvider

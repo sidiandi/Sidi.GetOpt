@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace Sidi.GetOpt
 
         class NoCommand
         {
-            [Description("")]
+            [Usage("")]
             public void Nothing() { }
         }
 
@@ -33,7 +32,7 @@ namespace Sidi.GetOpt
 
         public IEnumerable<IOption> Options { get; }
 
-        public string Description => getInstance.GetUsage();
+        public string Usage => getInstance.GetUsage();
 
         public object ParseValue(Type type, string value)
         {

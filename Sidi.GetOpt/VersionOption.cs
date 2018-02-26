@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,7 +16,7 @@ namespace Sidi.GetOpt
             this.assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
         }
 
-        [Description("Show version information")]
+        [Usage("Show version information")]
         public bool Version
         {
             set

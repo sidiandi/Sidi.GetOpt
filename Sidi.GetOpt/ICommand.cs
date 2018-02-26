@@ -10,7 +10,7 @@ namespace Sidi.GetOpt
         ICommand Parent { get; }
         IEnumerable<IOption> Options { get; }
         void PrintUsage(TextWriter w);
-        string Description { get; }
+        string Usage { get; }
         string ArgumentSyntax { get; }
     }
 
