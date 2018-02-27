@@ -14,6 +14,7 @@ Decorate your classes, fields, properties, and methods with the [Usage](Sidi.Get
 See a full example [here](example/Program.cs)
 
 ## Todo
+- [ ] Categories for options and commands
 - [ ] built-in value parsers for TimeSpan, DateTime, TextReader
 - [ ] extensible value parsers
 - [x] Modules
