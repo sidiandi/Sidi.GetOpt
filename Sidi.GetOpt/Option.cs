@@ -14,11 +14,13 @@ namespace Sidi.GetOpt
         public string Name { get; protected set; }
         public abstract string Usage { get; }
 
-        public static IOption Create(IObjectProvider getInstance, MemberInfo member)
+        static IEnumerable<IOption> noOptions = Enumerable.Empty<IOption>();
+
+        public static IEnumerable<IOption> GetOptions(IObjectProvider container, MemberInfo member)
         {
-            if (getInstance == null)
+            if (container == null)
             {
-                throw new ArgumentNullException(nameof(getInstance));
+                throw new ArgumentNullException(nameof(container));
             }
 
             if (member == null)
@@ -28,30 +30,36 @@ namespace Sidi.GetOpt
 
             if (!(member is FieldInfo || member is PropertyInfo))
             {
-                return null;
+                return noOptions;
+            }
+
+            if (member.GetCustomAttribute<ModuleAttribute>() != null)
+            {
+                return Option.GetOptions(ObjectProvider.ResolveNow(container, member));
             }
 
             var usage = member.GetUsage();
-            if (usage == null) return null;
+            if (usage == null) return noOptions;
 
             var command = member.GetCustomAttribute<CommandAttribute>();
-            if (command != null) return null;
+            if (command != null) return noOptions;
 
             if (member is FieldInfo)
             {
-                return (IOption) new FieldOption(getInstance, (FieldInfo)member);
+                return new[] { (IOption)new FieldOption(container, (FieldInfo)member) };
             }
             else if (member is PropertyInfo)
             {
-                return (IOption) new PropertyOption(getInstance, (PropertyInfo)member);
+                return new[] { (IOption)new PropertyOption(container, (PropertyInfo)member) };
             }
             throw new NotSupportedException(String.Format("{0} of type {1} is not supported.", member, member.GetType()));
         }
 
         public static IEnumerable<IOption> GetOptions(IObjectProvider getInstance)
         {
-            return getInstance.Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static)
-                .Select(_ => Option.Create(getInstance, _))
+            var members = getInstance.Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static);
+
+            return members.SelectMany(_ => Option.GetOptions(getInstance, _))
                 .Where(_ => _ != null)
                 .ToList();
         }

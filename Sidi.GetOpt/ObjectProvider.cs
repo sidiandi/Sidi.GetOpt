@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Sidi.GetOpt
 {
@@ -26,6 +27,11 @@ namespace Sidi.GetOpt
             }
         }
 
+        public override string ToString()
+        {
+            return Type.FullName;
+        }
+
         public static IObjectProvider Create(Type type, Func<object> getInstance)
         {
             return new ObjectProvider(type, getInstance);
@@ -43,6 +49,22 @@ namespace Sidi.GetOpt
             public Type Type => instance.GetType();
 
             public object Instance => instance;
+
+            public override string ToString()
+            {
+                return String.Format("[static] {0} ", Type.FullName);
+            }
+        }
+
+        internal static IObjectProvider Create(IObjectProvider container, MemberInfo member)
+        {
+            return member.GetGetter(container);
+        }
+
+        internal static IObjectProvider ResolveNow(IObjectProvider container, MemberInfo member)
+        {
+            var p = member.GetGetter(container);
+            return Create(p.Instance);
         }
 
         public static IObjectProvider Create(object instance)

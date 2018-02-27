@@ -26,6 +26,20 @@ namespace example
         }
     }
 
+    class Logging
+    {
+        [Usage("Increase verbosity")]
+        bool Verbosity
+        {
+            set { ++LogLevel; }
+        }
+
+        [Usage("Log level. The higher, the more is logged.")]
+        public int LogLevel { get; set; }
+
+        [Usage("Log file path")]
+        public string LogFile { set; get; }
+    }
 
     // Decorate a class with the Usage attribute to add a usage message
     [Usage(@"Demonstrator for the Sidi.GetOpt library. See https://github.com/sidiandi/Sidi.GetOpt.")]
@@ -37,9 +51,10 @@ namespace example
             return GetOpt.Run(new Example(), args);
         }
 
-        // Decorate fields with the Usage attribute to turn them into options.
-        [Usage("Increase verbosity")]
-        bool Verbose = false;
+        // Decorate fields with the Module attribute to extend the current class with the options and commands of the module
+        // This is a great way to add "standard" options to you application, e.g. logging 
+        [Module]
+        Logging logging = new Logging();
 
         // Decorate properties with the Usage attribute to turn them into options.
         [Usage("A number option")]
@@ -49,7 +64,7 @@ namespace example
         [Usage("Wait")]
         public void Wait(int seconds)
         {
-            if (Verbose)
+            if (logging.LogLevel > 0)
             {
                 Console.WriteLine("Waiting for {0} seonds", seconds);
             }

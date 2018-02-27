@@ -51,7 +51,7 @@ namespace Sidi.GetOpt
             if (command != null) return command;
             command = GetSingle(args, commandSource.Commands.Where(_ => commandName.IsAbbreviation(_.Name)));
             if (command != null) return command;
-            throw new ParseError(args, String.Format("No command {0}", commandName.Quote()));
+            throw new ParseError(args, String.Format("Invalid command: {0}", commandName));
         }
 
         static IOption GetSingle(Args args, IEnumerable<IOption> candidates)
@@ -90,7 +90,7 @@ namespace Sidi.GetOpt
             if (option != null) return option;
             option = GetSingle(args, options.Where(_ => optionName.IsAbbreviation(_.Name)));
             if (option != null) return option;
-            throw new ParseError(args, String.Format("No option {0}", optionName.Quote()));
+            throw new ParseError(args, String.Format("Invalid option: {0}", optionName));
         }
 
         public static IOption FindShortOption(this IEnumerable<IOption> options, Args args, string optionName)
@@ -104,7 +104,7 @@ namespace Sidi.GetOpt
             if (option != null) return option;
             option = GetSingle(args, options.Where(_ => optionName.IsAbbreviation(_.Name)));
             if (option != null) return option;
-            throw new ParseError(args, String.Format("No option {0}", optionName.Quote()));
+            throw new ParseError(args, String.Format("Invalid option: {0}", optionName));
         }
     }
 }

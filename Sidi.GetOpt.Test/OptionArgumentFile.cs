@@ -38,6 +38,20 @@ line breaks<<eot
         }
 
         [Test]
+        public void ArgumentFileNotFound()
+        {
+            var hw = new HelloWorld();
+            var argFile = Path.GetRandomFileName();
+
+            int e = 0;
+            using (new CaptureConsoleOutput())
+            {
+                e = Sidi.GetOpt.GetOpt.Run(hw, new[] { "-@" + argFile });
+            }
+            Assert.AreEqual(-1, e);
+        }
+
+        [Test]
         public void ArgumentFileShortOption()
         {
             var hw = new HelloWorld();

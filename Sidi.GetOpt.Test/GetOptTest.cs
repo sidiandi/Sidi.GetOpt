@@ -60,8 +60,22 @@ namespace Sidi.GetOpt.Test
         public void TooManyParameters()
         {
             var calc = new Calculator();
-            var e = GetOpt.Run(calc, new[] { "add", "1", "1", "1"});
-            Assert.AreNotEqual(0, e);
+            using (new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(calc, new[] { "add", "1", "1", "1" });
+                Assert.AreNotEqual(0, e);
+            }
+        }
+
+        [Test]
+        public void InvalidOption()
+        {
+            var calc = new Calculator();
+            using (new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(calc, new[] { "--adfasdfasdf" });
+                Assert.AreNotEqual(0, e);
+            }
         }
 
         [Test]

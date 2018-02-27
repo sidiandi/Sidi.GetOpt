@@ -23,6 +23,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandAttribute.cs" />
     <Compile Include="IObjectProvider.cs" />
+    <Compile Include="ModuleAttribute.cs" />
     <Compile Include="ObjectProvider.cs" />
     <Compile Include="OptionArgumentFile.cs" />
     <Compile Include="UsageAttribute.cs" />

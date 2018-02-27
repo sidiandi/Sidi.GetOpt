@@ -25,6 +25,13 @@ namespace Sidi.GetOpt
             return c.AddHelp();
         }
 
+        public static ICommand Create(string programName, IObjectProvider objectProvider)
+        {
+            var c = new ObjectCommand(null, programName);
+            c.CommandSource = new ObjectCommandSource(c, objectProvider);
+            return c.AddHelp();
+        }
+
         public ObjectCommand(ICommand parent, string name)
         {
             if (name == null)

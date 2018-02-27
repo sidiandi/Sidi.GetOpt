@@ -57,7 +57,7 @@ namespace Sidi.GetOpt
         {
             for (int i=0; i<this.args.Length; ++i)
             {
-                w.WriteLine("{2}{0}: {1}", i, args[i], i == this.i ? "=>" : "  ");
+                w.WriteLine("{2}[{0}] {1}", i, args[i], i == this.i ? "=>" : "  ");
             }
         }
 
