@@ -34,6 +34,7 @@
     <Compile Include="OptionArgumentFile.cs" />
     <Compile Include="PosixProgramArgumentSyntaxConventions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestAsyncApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\sidi.getopt\sidi.getopt.csproj">

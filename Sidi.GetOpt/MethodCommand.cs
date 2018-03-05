@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sidi.GetOpt
 {
@@ -199,6 +200,15 @@ namespace Sidi.GetOpt
                 // execute method - enough parameters
                 var instance = getInstance.Instance;
                 var r = this.method.Invoke(instance, args.parameters.ToArray());
+                if (r is Task<int>)
+                {
+                    r = ((Task<int>)r).Result;
+                }
+                else if (r is IAsyncResult)
+                {
+                    var asyncResult = (IAsyncResult)r;
+                    asyncResult.AsyncWaitHandle.WaitOne();
+                }
                 result = r is int ? (int)r : 0;
                 return false;
             }

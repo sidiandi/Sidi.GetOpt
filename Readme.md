@@ -17,6 +17,7 @@ See a full example [here](example/Program.cs)
 - [ ] Categories for options and commands
 - [ ] built-in value parsers for TimeSpan, DateTime, TextReader
 - [ ] extensible value parsers
+- [x] correct handling of commands with async methods
 - [x] Modules
 - [x] version info
 - [x] parameter files (-@arguments.txt)

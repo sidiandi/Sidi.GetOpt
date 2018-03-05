@@ -57,6 +57,18 @@ namespace Sidi.GetOpt.Test
         }
 
         [Test]
+        public void OptionsAfterArguments()
+        {
+            var hw = new HelloWorld();
+            using (var c = new CaptureConsoleOutput())
+            {
+                var e = GetOpt.Run(hw, new[] { "Donald", "--cordially" });
+                Assert.AreEqual(0, e);
+                StringAssert.Contains("dear Donald", c.output.ToString());
+            }
+        }
+
+        [Test]
         public void TooManyParameters()
         {
             var calc = new Calculator();
@@ -158,6 +170,12 @@ Options:
 
             Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--print", "sum", "1", "2", "3" }));
             Assert.AreEqual(6.0, commands.Calculator.Result);
+
+            using (var c = new CaptureConsoleOutput())
+            {
+                Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "sum", "1", "2", "3", "--print" }));
+                Assert.AreEqual(6.0, commands.Calculator.Result);
+            }
         }
 
         [Test]
@@ -183,6 +201,24 @@ Options:
             var a = new OptionsApplication();
             var e = GetOpt.Run(a, new[] { "--help" });
             Assert.AreEqual(0, e);
+        }
+
+        [Test]
+        public void CallAsyncMethodsCorrectly()
+        {
+            var hw = new TestAsyncApp();
+            var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "TestAsyncWithIntResult" });
+            Assert.IsTrue(hw.TestAsyncWasCalled);
+            Assert.AreEqual(123, exitCode);
+        }
+
+        [Test]
+        public void CallAsyncMethodsCorrectly2()
+        {
+            var hw = new TestAsyncApp();
+            var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "TestAsyncWithStringResult" });
+            Assert.IsTrue(hw.TestAsyncWasCalled);
+            Assert.AreEqual(0, exitCode);
         }
     }
 }
