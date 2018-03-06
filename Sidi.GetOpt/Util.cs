@@ -80,6 +80,23 @@ namespace Sidi.GetOpt
                 }
             }
 
+            // enum?
+            if (type.IsEnum)
+            {
+                var names = Enum.GetNames(type);
+                var candidates = names.Where(_ => value.IsAbbreviation(_));
+                var candidateCount = candidates.Count();
+                if (candidateCount == 0)
+                {
+                    throw new ParseError(null, String.Format("Unknown {0} value. Possible values: {1}", type.Name, String.Join(", ", names)));
+                }
+                if (candidateCount > 1)
+                {
+                    throw new ParseError(null, String.Format("Ambiguous {0} value. Possible values: {1}", type.Name, String.Join(", ", candidates)));
+                }
+                return Enum.Parse(type, candidates.Single());
+            }
+
             // has the type a Parse(string) method?
             {
                 var parser = type.GetParser(type, "Parse");

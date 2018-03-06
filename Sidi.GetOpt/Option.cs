@@ -74,7 +74,7 @@ namespace Sidi.GetOpt
             {
                 return String.Format(
                     Aliases.Where(_ => _.Length == 1).Select(_ => String.Format("-{0}{1}", _, this.Type.Name))
-                    .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}={1}", _, this.Type.Name)))
+                    .Concat(Aliases.Where(_ => _.Length > 1).Select(_ => String.Format("--{0}={1}", _, this.Type.GetNameForUsage())))
                     .JoinNonEmpty("|")
                     + " : " + this.Usage);
             }

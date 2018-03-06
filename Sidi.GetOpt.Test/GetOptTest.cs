@@ -3,6 +3,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using System;
+using System.Reflection;
+using System.IO;
 
 namespace Sidi.GetOpt.Test
 {
@@ -219,6 +222,43 @@ Options:
             var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "TestAsyncWithStringResult" });
             Assert.IsTrue(hw.TestAsyncWasCalled);
             Assert.AreEqual(0, exitCode);
+        }
+
+        [Test]
+        public void ParseValues()
+        {
+            using (var c = new CaptureConsoleOutput())
+            {
+                var a = new ValueParserTestApplication();
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--birthday=2394-03-01" }));
+                Assert.AreEqual(new DateTime(2394, 3, 1, 0, 0, 0), a.Birthday);
+
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--duration=1.2:3:4.5" }));
+                Assert.AreEqual(new TimeSpan(1, 2, 3, 4, 500), a.Duration);
+
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--duration=0:10" }));
+                Assert.AreEqual(TimeSpan.FromMinutes(10), a.Duration);
+
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--fruit=orange" }));
+                Assert.AreEqual(ValueParserTestApplication.Fruits.Orange, a.Fruit);
+
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--fruit=o" }));
+                Assert.AreEqual(ValueParserTestApplication.Fruits.Orange, a.Fruit);
+            }
+        }
+
+        [Test]
+        public void EnumHelp()
+        {
+            using (var c = new CaptureConsoleOutput())
+            {
+                var a = new ValueParserTestApplication();
+                Assert.AreEqual(0, Sidi.GetOpt.GetOpt.Run(a, new[] { "--help" }));
+                foreach (var n in Enum.GetNames(typeof(ValueParserTestApplication.Fruits)))
+                {
+                    StringAssert.Contains(n, c.output.ToString());
+                }
+            }
         }
     }
 }

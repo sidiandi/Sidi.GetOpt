@@ -219,12 +219,21 @@ namespace Sidi.GetOpt
         {
             if (option.Type.Equals(typeof(bool)))
             {
-                return String.Format("--{0} : {2}", option.Name, option.Type, option.Usage);
+                return String.Format("--{0} : {1}", option.Name, option.Usage);
             }
             else
             {
-                return String.Format("--{0}={1} : {2}", option.Name, option.Type, option.Usage);
+                return String.Format("--{0}={1} : {2}", option.Name, GetNameForUsage(option.Type), option.Usage);
             }
+        }
+
+        public static string GetNameForUsage(this Type type)
+        {
+            if (type.IsEnum)
+            {
+                return String.Join("|", Enum.GetNames(type));
+            }
+            return type.Name;
         }
 
         public static string GetSummary(this ICommand command)
