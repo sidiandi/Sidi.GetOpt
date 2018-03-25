@@ -10,13 +10,16 @@ namespace Sidi.GetOpt.Test
     {
     }
 
-    class ParameterlessMethod
+    class ParameterlessMethodApplication
     {
         [Usage("To test if a parameterless method is called")]
         public void Main()
         {
             MainWasCalled = true;
         }
+
+        [Usage("To test if options are processed")]
+        public bool SomeOption { get; set; }
 
         public bool MainWasCalled { get; private set; }
     }

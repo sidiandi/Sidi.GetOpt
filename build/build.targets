@@ -122,20 +122,16 @@
     <Exec Command="&quot;$(NUnitConsole)&quot; --labels=On --result=&quot;$(BuildDir)\TestResult.xml&quot; --labels=All @(TestTargets -> '&quot;%(Identity)&quot;', ' ')" />
   </Target>
 
-  <Target Name="Pack" DependsOnTargets="GetVersion">
-    <PropertyGroup>
-		<PackageDir>$(BuildDir)\package</PackageDir>
-	</PropertyGroup>
-	<RemoveDir Directories="$(PackageDir)"/>
-	<MakeDir Directories="$(PackageDir)" />
-	<Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; pack &quot;$(SourceDir)\%(Package.Identity)\%(Package.Identity).csproj&quot; -OutputDirectory &quot;$(PackageDir)&quot; -Version $(Version)" />
-	<ItemGroup>
-		<PackageFiles Include="$(PackageDir)\%(Package.Identity).$(Version).nupkg" />
-	</ItemGroup>
+  <Target Name="NugetPack" DependsOnTargets="Build">
+    <NugetPack OutputDirectory="$(PackageDir)" Targets="@(Targets)" Version="$(GfvNuGetVersion)" >
+      <Output ItemName="NugetPackages" TaskParameter="Outputs" />
+    </NugetPack>
   </Target>
 
-  <Target Name="Push" DependsOnTargets="Test;Pack">
-    <Exec WorkingDirectory="$(ReleaseDir)" Command="&quot;$(Nuget)&quot; push &quot;%(PackageFiles.Identity)&quot; -ApiKey $(NugetApiKey) -Source $(NugetFeed)" />
+  <Target Name="NugetPush" DependsOnTargets="NugetPack">
+		<Message Text="Pushing $(GfvSemVer)" />
+		<Message Text="$(NugetApiKey)" />
+    <NugetPush Packages="@(NugetPackages)" Source="$(NugetSource)" ApiKey="$(NugetApiKey)" />
   </Target>
 
   <Target Name="Install" DependsOnTargets="Setup">
@@ -159,10 +155,10 @@
     <RemoveDir Directories="$(BuildDir)" />
   </Target>
 
-  <Target Name="Publish" DependsOnTargets="Test;Setup;ZipProductFiles;Tag;PublishAsGithubRelease" />
+  <Target Name="Publish" DependsOnTargets="Test;Setup;ZipProductFiles;NugetPush;Tag;PublishAsGithubRelease" />
 
   <Target Name="PublishBeta" DependsOnTargets="Test;Setup;ZipProductFiles;Tag;PublishOnDropbox" />
   
-  <Target Name="AllLocal" DependsOnTargets="Test;Setup;ZipProductFiles" />
+  <Target Name="AllLocal" DependsOnTargets="Test;NugetPack;Setup;ZipProductFiles" />
   
 </Project>

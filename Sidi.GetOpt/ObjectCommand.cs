@@ -164,15 +164,18 @@ namespace Sidi.GetOpt
             if (LongOption(args)) return true;
             if (ShortOption(args)) return true;
 
-            if (commands.Count() > 1)
+            if (this.MultiCommand)
             {
-                SelectCommand(args);
-                return true;
+                if (args.HasNext)
+                {
+                    SelectCommand(args);
+                }
+                return false;
             }
             else
             {
-                ExecuteCommand(commands.FirstOrDefault(), args);
-                return true;
+                ExecuteCommand(SingleCommand, args);
+                return false;
             }
         }
 
@@ -197,20 +200,14 @@ namespace Sidi.GetOpt
                 args.Insert(new[] { "--help" });
             }
 
-            if (args.HasNext)
+            for (;;)
             {
-                for (; args.HasNext; )
+                if (!Parse(args))
                 {
-                    if (!Parse(args))
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
-            else
-            {
-                Parse(args);
-            }
+
             return result;
         }
 

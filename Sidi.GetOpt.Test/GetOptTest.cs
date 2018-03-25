@@ -191,9 +191,10 @@ Options:
         [Test]
         public void ParameterlessCommand()
         {
-            var p = new ParameterlessMethod();
-            var e = GetOpt.Run(p, new string[] { });
+            var p = new ParameterlessMethodApplication();
+            var e = GetOpt.Run(p, new string[] { "--some-option" });
             Assert.AreEqual(0, e);
+            Assert.IsTrue(p.SomeOption);
             Assert.IsTrue(p.MainWasCalled);
         }
 

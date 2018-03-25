@@ -41,23 +41,54 @@ namespace Sidi.GetOpt
                 });
         }
 
-        public int Invoke(Args args)
+        object ReadParameter(Args args, ParameterInfo parameterInfo)
         {
+            ParseOptions(args);
+
+            var expectedType = parameterInfo.ParameterType;
+
+            if (expectedType.IsArray)
+            {
+                return ReadArrayParameter(args, parameterInfo);
+            }
+
             if (args.HasNext)
             {
-                for (;;)
-                {
-                    if (!Parameter(args))
-                    {
-                        break;
-                    }
-                }
+                var p = Util.ParseValue(getInstance.Instance, expectedType, args.Next);
+                args.MoveNext();
+                return p;
             }
             else
             {
-                Parameter(args);
+                return null;
             }
-            return result;
+        }
+
+        public int Invoke(Args args)
+        {
+            var parameters = this.parameterInfo.Select(_ => ReadParameter(args, _)).ToArray();
+            ParseOptions(args);
+            if (args.HasNext)
+            {
+                throw new ParseError(args, String.Format("Too many parameters for {0}", this));
+            }
+            var instance = getInstance.Instance;
+            return ConvertResultToInt(this.method.Invoke(instance, parameters.ToArray()));
+        }
+
+        public static int ConvertResultToInt(object r)
+        {
+            if (r is Task<int>)
+            {
+                r = ((Task<int>)r).Result;
+            }
+            else if (r is IAsyncResult)
+            {
+                var asyncResult = (IAsyncResult)r;
+                asyncResult.AsyncWaitHandle.WaitOne();
+            }
+            var exitCode = r is int ? (int)r : 0;
+            return exitCode;
         }
 
         bool OptionStop(Args args)
@@ -191,51 +222,9 @@ namespace Sidi.GetOpt
             return true;
         }
 
-        bool Parameter(Args args)
+        object ReadArrayParameter(Args args, ParameterInfo parameterInfo)
         {
-            if (args.parameters.Count >= parameterInfo.Length)
-            {
-                // execute method - enough parameters
-                var instance = getInstance.Instance;
-                var r = this.method.Invoke(instance, args.parameters.ToArray());
-                if (r is Task<int>)
-                {
-                    r = ((Task<int>)r).Result;
-                }
-                else if (r is IAsyncResult)
-                {
-                    var asyncResult = (IAsyncResult)r;
-                    asyncResult.AsyncWaitHandle.WaitOne();
-                }
-                result = r is int ? (int)r : 0;
-                return false;
-            }
-
-            var expectedType = parameterInfo[args.parameters.Count].ParameterType;
-
-            if (expectedType.IsArray)
-            {
-                return ArrayParameter(args);
-            }
-
-            ParseOptions(args);
-
-            if (!args.HasNext)
-            {
-                return false;
-            }
-
-            args.MoveNext();
-
-            args.parameters.Add(Util.ParseValue(getInstance.Instance, expectedType, args.Current));
-            return true;
-        }
-
-        bool ArrayParameter(Args args)
-        {
-            var expectedType = parameterInfo[args.parameters.Count].ParameterType;
-            var elementType = expectedType.GetElementType();
-
+            var elementType = parameterInfo.ParameterType.GetElementType();
             var items = new List<object>();
 
             for (; ; )
@@ -246,8 +235,7 @@ namespace Sidi.GetOpt
                 items.Add(Util.ParseValue(getInstance.Instance, elementType, args.Current));
             }
 
-            args.parameters.Add(items.ToArray(elementType));
-            return true;
+            return items.ToArray(elementType);
         }
 
         const string endl = "\r\n";
