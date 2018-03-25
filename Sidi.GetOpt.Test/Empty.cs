@@ -10,6 +10,17 @@ namespace Sidi.GetOpt.Test
     {
     }
 
+    class ParameterlessMethod
+    {
+        [Usage("To test if a parameterless method is called")]
+        public void Main()
+        {
+            MainWasCalled = true;
+        }
+
+        public bool MainWasCalled { get; private set; }
+    }
+
     class OptionsApplication
     {
         [Usage("prints all arguments")]

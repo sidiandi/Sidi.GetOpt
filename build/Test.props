@@ -11,6 +11,9 @@
 	<ItemGroup>
 		<TestFiles Include="test-data\**\*" />
 	</ItemGroup>
+	<PropertyGroup>
+		<TestDir>$(OutDir)\..\test-data</TestDir>
+	</PropertyGroup>
 	<Message Importance="High" Text="Copying test files to $(TestDir)" />
 	<Copy
 		SourceFiles="@(TestFiles)"

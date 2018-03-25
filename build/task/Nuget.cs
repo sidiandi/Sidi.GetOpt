@@ -48,12 +48,14 @@ public class SubProcess
         }
     }
 
-    public SubProcess(string fileName, params string[] args)
+    public SubProcess(TaskLoggingHelper log, string fileName, params string[] args)
     {
-        this.fileName = fileName;
+        this.log = log;
+		this.fileName = fileName;
         this.args = args;
     }
 
+	TaskLoggingHelper log;
     public string WorkingDirectory;
     public string Input = String.Empty;
     public string Output;
@@ -67,7 +69,7 @@ public class SubProcess
 		await Run();
 		if (ExitCode != 0)
 		{
-			Console.WriteLine(this);
+			log.LogMessage("{0}", this);
 			throw new Exception("Exit code not null");
 		}
 	}
@@ -94,7 +96,7 @@ public class SubProcess
 
         p.Start();
 
-        Console.WriteLine("start: {0}", this);
+		log.LogMessage(MessageImportance.Normal, "start: {0}", this);
         
         using (var output = new StringWriter())
         using (var error = new StringWriter())
@@ -105,12 +107,12 @@ public class SubProcess
                 CopyToAsync(p.StandardError, error),
                 CopyToAsync(input, p.StandardInput));
             p.WaitForExit();
-            Console.WriteLine("exit with exit code {1}: {0}", this, this.ExitCode);
+			log.LogMessage(MessageImportance.Normal, "exit with exit code {1}: {0}", this, this.ExitCode);
             Output = output.ToString();
             Error = error.ToString();
             if (!String.IsNullOrEmpty(Error))
             {
-                Console.WriteLine("Error: {0}", Error);
+				log.LogMessage(MessageImportance.Normal, "Error: {0}", Error);
             }
         }
     }
@@ -148,7 +150,7 @@ public static class Util
 
 public static class Nuget
 {
-    public static string Pack(string csProjFile, string outputDirectory, string version)
+    public static string Pack(TaskLoggingHelper log, string csProjFile, string outputDirectory, string version)
     {
         string package = null;
         var p = new List<string>();
@@ -158,68 +160,30 @@ public static class Nuget
             p.AddRange(new[]{"-Version", version});
         }
 
-        var nuget = new SubProcess("nuget", p.ToArray());
+        var nuget = new SubProcess(log, "nuget", p.ToArray());
         nuget.Run().Wait();
         package = nuget.Output.RegexGet(@"Successfully created package '([^']+)'.");
-        Console.WriteLine(package);
         return package;
     }
 }
 
-public class NugetPack: ITask  
+public class NugetPack: Task  
 {  
-    //When implementing the ITask interface, it is necessary to  
-    //implement a BuildEngine property of type  
-    //Microsoft.Build.Framework.IBuildEngine. This is done for  
-    //you if you derive from the Task class.  
-    private IBuildEngine buildEngine;  
-    public IBuildEngine BuildEngine  
-    {  
-        get  
-        {  
-            return buildEngine;  
-        }  
-        set  
-        {  
-            buildEngine = value;  
-        }  
-        }  
-
-    // When implementing the ITask interface, it is necessary to  
-    // implement a HostObject property of type Object.  
-    // This is done for you if you derive from the Task class.  
-    private ITaskHost hostObject;  
-    public ITaskHost HostObject  
-    {  
-        get  
-        {  
-            return hostObject;  
-        }  
-
-        set  
-        {  
-            hostObject = value;  
-        }  
-    } 
-
     public string OutputDirectory { get; set; } 
     public string Version { set; get; }
     public ITaskItem[] Targets { set; get; }
     public ITaskItem[] Outputs { set; get; }
 
-    public bool Execute()  
+    override public bool Execute()  
     {  
         var targetsToPack = this.Targets
             .Where(_ => _.ItemSpec.EndsWith(".dll"))
             .Where(_ => !_.ItemSpec.EndsWith(".Test.dll"));
 
-        Console.WriteLine(String.Join("\r\n", targetsToPack));
-
         var output = new List<ITaskItem>();
         foreach (var target in targetsToPack)
         {
-            // Util.Dump(Console.Out, target);
-            output.Add(new TaskItem(Nuget.Pack(target.GetMetadata("MSBuildSourceProjectFile"), this.OutputDirectory, Version)));
+            output.Add(new TaskItem(Nuget.Pack(Log, target.GetMetadata("MSBuildSourceProjectFile"), this.OutputDirectory, Version)));
         }
         Outputs = output.ToArray();
 
@@ -227,47 +191,13 @@ public class NugetPack: ITask
     }  
 }  
 
-public class NugetPush: ITask  
+public class NugetPush: Task  
 {  
-    //When implementing the ITask interface, it is necessary to  
-    //implement a BuildEngine property of type  
-    //Microsoft.Build.Framework.IBuildEngine. This is done for  
-    //you if you derive from the Task class.  
-    private IBuildEngine buildEngine;  
-    public IBuildEngine BuildEngine  
-    {  
-        get  
-        {  
-            return buildEngine;  
-        }  
-        set  
-        {  
-            buildEngine = value;  
-        }  
-        }  
-
-    // When implementing the ITask interface, it is necessary to  
-    // implement a HostObject property of type Object.  
-    // This is done for you if you derive from the Task class.  
-    private ITaskHost hostObject;  
-    public ITaskHost HostObject  
-    {  
-        get  
-        {  
-            return hostObject;  
-        }  
-
-        set  
-        {  
-            hostObject = value;  
-        }  
-    } 
-
     public ITaskItem[] Packages { set; get; }
     public string Source {get; set; }
     public string ApiKey {get; set; }
 
-    public bool Execute()  
+    override public bool Execute()  
     {  
         if (ApiKey == null)
         {
@@ -281,98 +211,120 @@ public class NugetPush: ITask
             {
                 args.AddRange(new[]{"-Source", Source});
             }
-            new SubProcess("nuget",args.ToArray()).RunChecked().Wait();
+            new SubProcess(Log, "nuget",args.ToArray()).RunChecked().Wait();
         }
         return true;  
     }  
 }
 
-public class NugetRestore: ITask  
+public class NugetRestore: Task  
 {  
-    //When implementing the ITask interface, it is necessary to  
-    //implement a BuildEngine property of type  
-    //Microsoft.Build.Framework.IBuildEngine. This is done for  
-    //you if you derive from the Task class.  
-    private IBuildEngine buildEngine;  
-    public IBuildEngine BuildEngine  
-    {  
-        get  
-        {  
-            return buildEngine;  
-        }  
-        set  
-        {  
-            buildEngine = value;  
-        }  
-        }  
-
-    // When implementing the ITask interface, it is necessary to  
-    // implement a HostObject property of type Object.  
-    // This is done for you if you derive from the Task class.  
-    private ITaskHost hostObject;  
-    public ITaskHost HostObject  
-    {  
-        get  
-        {  
-            return hostObject;  
-        }  
-
-        set  
-        {  
-            hostObject = value;  
-        }  
-    } 
-
     public string SolutionFile { get; set; } 
 
-    public bool Execute()  
+    override public bool Execute()  
     {  
-		new SubProcess("nuget", new[]{"restore", SolutionFile}).RunChecked().Wait();
+		new SubProcess(Log, "nuget", new[]{"restore", SolutionFile}).RunChecked().Wait();
         return true;  
     }  
 }  
 
-public class NugetUpdate: ITask  
+public class NugetUpdate: Task  
 {  
-    //When implementing the ITask interface, it is necessary to  
-    //implement a BuildEngine property of type  
-    //Microsoft.Build.Framework.IBuildEngine. This is done for  
-    //you if you derive from the Task class.  
-    private IBuildEngine buildEngine;  
-    public IBuildEngine BuildEngine  
-    {  
-        get  
-        {  
-            return buildEngine;  
-        }  
-        set  
-        {  
-            buildEngine = value;  
-        }  
-        }  
-
-    // When implementing the ITask interface, it is necessary to  
-    // implement a HostObject property of type Object.  
-    // This is done for you if you derive from the Task class.  
-    private ITaskHost hostObject;  
-    public ITaskHost HostObject  
-    {  
-        get  
-        {  
-            return hostObject;  
-        }  
-
-        set  
-        {  
-            hostObject = value;  
-        }  
-    } 
-
     public string SolutionFile { get; set; } 
 
-    public bool Execute()  
+    override public bool Execute()  
     {  
-		new SubProcess("nuget", new[]{"update", SolutionFile}).RunChecked().Wait();
+		new SubProcess(Log, "nuget", new[]{"update", SolutionFile}).RunChecked().Wait();
         return true;  
     }  
-}  
+}
+
+public class NugetRead: Task  
+{  
+    public string SolutionDir { get; set; } 
+    public string PropsFile { set; get; }
+
+    public class Package
+    {
+        [XmlAttribute]
+        public string id;
+        [XmlAttribute]
+        public string version;
+
+        public override string ToString()
+        {
+            return String.Join(" ", id, version);
+        }
+    }
+
+    [XmlRoot("packages")]
+    public class PackagesConfig
+    {
+        [XmlElement("package", typeof(Package))]
+        public Package[] Packages;
+    }
+
+    public static Package[] ReadPackagesConfig(FileInfo packagesConfigFile)
+    {
+        using (var r = File.OpenRead(packagesConfigFile.FullName))
+        {
+            return ((PackagesConfig)new XmlSerializer(typeof(PackagesConfig)).Deserialize(r)).Packages;
+        }
+    }
+
+    static IEnumerable<Package> ReadNugetPackages(string SolutionDir)
+    {
+        // locate all packages.config files and read them
+        var sd = new DirectoryInfo(SolutionDir);
+        var packagesConfigFiles = new[]{sd}.Concat(sd.GetDirectories())
+            .SelectMany(_ => _.GetFiles("packages.config"));
+        var packages = packagesConfigFiles.SelectMany(_ => ReadPackagesConfig(_));
+        return packages;
+    }
+
+    static string GetPropName(string text)
+    {
+        return String.Join("_", Regex.Split(text, @"[^_A-Za-z0-9]"));
+    }
+
+    static void WriteProp(TextWriter w, Package package, string propName, string value)
+    {
+        var fullPropName = String.Join("_", "Nuget", GetPropName(package.id), propName);
+        w.WriteLine(String.Format("<{0}>{1}</{0}>", fullPropName, value));
+    }
+
+    static void WriteNugetPropsFile(string propsFile, IEnumerable<Package> packages, string repositoryDir)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(propsFile));
+        using (var w = new StreamWriter(propsFile))
+        {
+            w.WriteLine(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<!-- Generated. Changes will be lost. -->
+<Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+  <PropertyGroup>
+");
+            foreach (var package in packages)
+            {
+                var id = package.id;
+                WriteProp(w, package, "Version", package.version);
+                var dir = Path.Combine(repositoryDir, String.Join(".", package.id, package.version));
+                WriteProp(w, package, "Directory", dir);
+                WriteProp(w, package, "ToolsDirectory", Path.Combine(dir, "Tools"));
+            }
+            w.WriteLine(@"</PropertyGroup>
+</Project>
+");
+        }
+    }
+
+    override public bool Execute()  
+    {  
+		// locate package repository
+        var repositoryDir = Path.GetFullPath(Path.Combine(SolutionDir, "..", "packages"));
+
+        var packages = ReadNugetPackages(SolutionDir);
+
+        WriteNugetPropsFile(PropsFile, packages, repositoryDir);
+        return true;  
+    }  
+}

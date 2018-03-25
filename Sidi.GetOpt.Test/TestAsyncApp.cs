@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Sidi.GetOpt.Test
 {
+    #pragma warning disable CS1998
     class TestAsyncApp
     {
         [Usage("Other command")]

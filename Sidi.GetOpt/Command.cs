@@ -16,7 +16,7 @@ namespace Sidi.GetOpt
                 return GetCommands(parent, ObjectProvider.ResolveNow(containingObject, m), inheritedOptions);
             }
 
-            return new[] { ObjectCommand.Create(parent, m, containingObject) };
+            return ObjectCommand.Create(parent, m, containingObject).ToEnumerable();
         }
 
         public static IEnumerable<ICommand> GetCommands(ICommand parent, IObjectProvider objectProvider, IEnumerable<IOption> inheritedOptions)

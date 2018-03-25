@@ -8,21 +8,21 @@ namespace Sidi.GetOpt
 {
     class ObjectCommand : ICommand
     {
-        public static ICommand Create(ICommand parent, MemberInfo member, IObjectProvider containingObject)
+        public static Maybe<ICommand> Create(ICommand parent, MemberInfo member, IObjectProvider containingObject)
         {
             var getter = member.GetGetter(containingObject);
 
             var command = member.GetCustomAttribute<CommandAttribute>();
             if (command == null)
             {
-                return null;
+                return new Nothing<ICommand>();
             }
 
             var name = Util.CSharpIdentifierToLongOption(member.Name);
 
             var c = new ObjectCommand(parent, name);
             c.CommandSource = new ObjectCommandSource(c, getter);
-            return c.AddHelp();
+            return new Just<ICommand>(c.AddHelp());
         }
 
         public static ICommand Create(string programName, IObjectProvider objectProvider)
@@ -55,6 +55,8 @@ namespace Sidi.GetOpt
 
         bool OptionStop(Args args)
         {
+            if (!args.HasNext) return false;
+
             if (args.TreatAsParameters)
             {
                 return false;
@@ -71,6 +73,8 @@ namespace Sidi.GetOpt
 
         bool ShortOption(Args args)
         {
+            if (!args.HasNext) return false;
+
             if (args.TreatAsParameters)
             {
                 return false;
@@ -116,6 +120,8 @@ namespace Sidi.GetOpt
 
         bool LongOption(Args args)
         {
+            if (!args.HasNext) return false;
+
             if (args.TreatAsParameters)
             {
                 return false;
@@ -163,34 +169,25 @@ namespace Sidi.GetOpt
 
             if (commands.Count() > 1)
             {
-                return SelectCommand(args);
+                SelectCommand(args);
+                return true;
             }
             else
             {
-                return ExecuteCommand(commands.FirstOrDefault(), args);
+                ExecuteCommand(commands.FirstOrDefault(), args);
+                return true;
             }
         }
 
-        bool SelectCommand(Args args)
+        void SelectCommand(Args args)
         {
-            if (!args.HasNext)
-            {
-                return false;
-            }
-
-            args.MoveNext();
-
-            var name = args.Current;
-
             var command = CommandSource.FindCommand(args);
-
-            return ExecuteCommand(command, args);
+            ExecuteCommand(command, args);
         }
 
-        bool ExecuteCommand(ICommand command, Args args)
+        void ExecuteCommand(ICommand command, Args args)
         {
             result = command.Invoke(args);
-            return true;
         }
 
         int result;
@@ -203,12 +200,19 @@ namespace Sidi.GetOpt
                 args.Insert(new[] { "--help" });
             }
 
-            for (; args.HasNext;)
+            if (args.HasNext)
             {
-                if (!Parse(args))
+                for (; args.HasNext; )
                 {
-                    break;
+                    if (!Parse(args))
+                    {
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                Parse(args);
             }
             return result;
         }

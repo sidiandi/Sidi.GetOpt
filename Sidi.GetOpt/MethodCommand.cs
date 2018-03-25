@@ -41,12 +41,19 @@ namespace Sidi.GetOpt
 
         public int Invoke(Args args)
         {
-            for (;;)
+            if (args.HasNext)
             {
-                if (!Parse(args))
+                for (;;)
                 {
-                    break;
+                    if (!Parameter(args))
+                    {
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                Parameter(args);
             }
             return result;
         }
@@ -140,11 +147,11 @@ namespace Sidi.GetOpt
                 return false;
             }
 
-            args.MoveNext();
-
             var p = optionText.Split(new[] { '=' }, 2);
             var name = p.First();
             var valueText = p.Length == 2 ? p[1] : null;
+
+            args.MoveNext();
 
             var option = this.Options.FindLongOption(args);
 
@@ -168,17 +175,6 @@ namespace Sidi.GetOpt
 
             option.Set(valueText);
             return true;
-        }
-
-        bool Parse(Args args)
-        {
-            /*
-            if (OptionStop(args)) return true;
-            if (LongOption(args)) return true;
-            if (ShortOption(args)) return true;
-            */
-
-            return Parameter(args);
         }
 
         bool ParseOptions(Args args)

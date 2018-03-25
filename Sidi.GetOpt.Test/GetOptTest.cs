@@ -189,6 +189,15 @@ Options:
         }
 
         [Test]
+        public void ParameterlessCommand()
+        {
+            var p = new ParameterlessMethod();
+            var e = GetOpt.Run(p, new string[] { });
+            Assert.AreEqual(0, e);
+            Assert.IsTrue(p.MainWasCalled);
+        }
+
+        [Test]
         public void OptionStyleApplication()
         {
             var args = Enumerable.Range(0, 10).Select(_ => _.ToString()).ToArray();
