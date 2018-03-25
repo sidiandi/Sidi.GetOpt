@@ -20,23 +20,25 @@ namespace Sidi.GetOpt
 
         public string ArgumentSyntax => this.method.GetArgumentSyntax();
 
-        public static ICommand Create(ICommand parent, IObjectProvider containingObject, MethodInfo method, IEnumerable<IOption> inheritedOptions)
+        public static Maybe<ICommand> Create(ICommand parent, IObjectProvider containingObject, MethodInfo method, IEnumerable<IOption> inheritedOptions)
         {
             if (inheritedOptions == null)
             {
                 throw new ArgumentNullException(nameof(inheritedOptions));
             }
 
-            var usage = method.GetUsage();
-            if (usage == null) return null;
+            return method
+                .GetUsage()
+                .Select(usage =>
+                {
+                    var help = new HelpOption();
+                    var helpCommand = new ObjectCommandSource(null, ObjectProvider.Create(help));
 
-            var help = new HelpOption();
-            var helpCommand = new ObjectCommandSource(null, ObjectProvider.Create(help));
+                    var c = new MethodCommand(parent, containingObject, method, helpCommand.Options.Concat(inheritedOptions));
 
-            var c = new MethodCommand(parent, containingObject, method, helpCommand.Options.Concat(inheritedOptions));
-
-            help.Command = c;
-            return c;
+                    help.Command = c;
+                    return (ICommand) c;
+                });
         }
 
         public int Invoke(Args args)

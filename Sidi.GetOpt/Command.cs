@@ -32,8 +32,7 @@ namespace Sidi.GetOpt
                 .ToList();
 
             return objectProvider.Type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static)
-                .Select(_ => MethodCommand.Create(parent, objectProvider, _, inheritedOptions))
-                .Where(_ => _ != null)
+                .SelectMany(_ => MethodCommand.Create(parent, objectProvider, _, inheritedOptions).ToEnumerable())
                 .Concat(commandObjects)
                 .ToList();
 

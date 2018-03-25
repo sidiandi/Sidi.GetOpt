@@ -39,10 +39,10 @@ namespace Sidi.GetOpt
             }
 
             var usage = member.GetUsage();
-            if (usage == null) return noOptions;
+            if (!usage.HasValue) return noOptions;
 
-            var command = member.GetCustomAttribute<CommandAttribute>();
-            if (command != null) return noOptions;
+            var command = member.GetCustomAttribute<CommandAttribute>().ToMaybe();
+            if (command.HasValue) return noOptions;
 
             if (member is FieldInfo)
             {

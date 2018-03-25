@@ -12,17 +12,14 @@ namespace Sidi.GetOpt
         {
             var getter = member.GetGetter(containingObject);
 
-            var command = member.GetCustomAttribute<CommandAttribute>();
-            if (command == null)
-            {
-                return new Nothing<ICommand>();
-            }
-
-            var name = Util.CSharpIdentifierToLongOption(member.Name);
-
-            var c = new ObjectCommand(parent, name);
-            c.CommandSource = new ObjectCommandSource(c, getter);
-            return new Just<ICommand>(c.AddHelp());
+            return member.GetCustomAttribute<CommandAttribute>().ToMaybe()
+                .Select(command =>
+                {
+                    var name = Util.CSharpIdentifierToLongOption(member.Name);
+                    var c = new ObjectCommand(parent, name);
+                    c.CommandSource = new ObjectCommandSource(c, getter);
+                    return (ICommand)c.AddHelp();
+                });
         }
 
         public static ICommand Create(string programName, IObjectProvider objectProvider)
@@ -259,7 +256,8 @@ namespace Sidi.GetOpt
                 var c = CommandSource.Commands.SingleOrDefault();
                 if (c == null)
                 {
-                    c = MethodCommand.Create(null, new ObjectProvider(this.GetType(), () => this), this.GetType().GetMethod("Nothing"), this.Options);
+                    c = MethodCommand.Create(null, new ObjectProvider(this.GetType(), () => this), this.GetType().GetMethod("Nothing"), this.Options)
+                        .Value;
                 }
                 return c;
             }
