@@ -104,7 +104,7 @@ namespace Sidi.GetOpt
 
             public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.field.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
 
-            public override string Usage => field.GetUsage();
+            public override string Usage => field.GetUsage().Or(String.Empty);
 
             public override void Set(string value)
             {
@@ -133,7 +133,7 @@ namespace Sidi.GetOpt
 
             public override IEnumerable<string> Aliases => new[] { Name }.Concat(this.property.GetCustomAttributes<AliasAttribute>().Select(_ => _.Alias));
 
-            public override string Usage => property.GetUsage();
+            public override string Usage => property.GetUsage().Or(String.Empty);
 
             public override void Set(string value)
             {

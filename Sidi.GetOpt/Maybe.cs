@@ -10,6 +10,8 @@ namespace Sidi.GetOpt
     {
         T Value { get; }
         bool HasValue { get; }
+
+        Maybe<Y> Select<Y>(Func<T, Y> func);
     }
 
     public class Nothing<T> : Maybe<T>
@@ -17,6 +19,11 @@ namespace Sidi.GetOpt
         public T Value => throw new NotImplementedException();
 
         public bool HasValue => false;
+
+        public Maybe<Y> Select<Y>(Func<T, Y> func)
+        {
+            return new Nothing<Y>();
+        }
     }
 
     public class Just<T> : Maybe<T>
@@ -31,6 +38,11 @@ namespace Sidi.GetOpt
         public T Value => value;
 
         public bool HasValue => true;
+
+        public Maybe<Y> Select<Y>(Func<T, Y> func)
+        {
+            return new Just<Y>(func(Value));
+        }
     }
 
     public static class MaybeExtensions
@@ -62,6 +74,11 @@ namespace Sidi.GetOpt
             {
                 return Enumerable.Empty<T>();
             }
+        }
+
+        public static T Or<T>(this Maybe<T> maybe, T defaultValue)
+        {
+            return maybe.HasValue ? maybe.Value : defaultValue;
         }
     }
 

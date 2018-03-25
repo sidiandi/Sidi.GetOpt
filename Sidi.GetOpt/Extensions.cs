@@ -61,18 +61,17 @@ namespace Sidi.GetOpt
             return String.Join(separator, items.Where(_ => _ != null).Select(_ => _.Trim()).Where(_ => !String.IsNullOrEmpty(_)));
         }
 
-        public static string GetUsage(this Type type)
+        public static Maybe<string> GetUsage(this Type type)
         {
-            var da = type.GetCustomAttribute<UsageAttribute>();
-            if (da == null) return null;
-            return da.Usage;
+            return type.GetCustomAttribute<UsageAttribute>()
+                .ToMaybe().Select(_ => _.Usage);
         }
 
-        public static string GetUsage(this MemberInfo member)
+        public static Maybe<string> GetUsage(this MemberInfo member)
         {
-            var da = member.GetCustomAttribute<UsageAttribute>();
-            if (da == null) return null;
-            return da.Usage;
+            return member.GetCustomAttribute<UsageAttribute>()
+                .ToMaybe()
+                .Select(_ => _.Usage);
         }
 
         public static bool TryRemovePrefix(this string text, string prefix, out string textWithoutPrefix)
@@ -154,7 +153,7 @@ namespace Sidi.GetOpt
             return a;
         }
 
-        public static string GetUsage(this IObjectProvider p)
+        public static Maybe<string> GetUsage(this IObjectProvider p)
         {
             return p.Type.GetUsage();
         }

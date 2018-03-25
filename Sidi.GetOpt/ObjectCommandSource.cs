@@ -32,7 +32,7 @@ namespace Sidi.GetOpt
 
         public IEnumerable<IOption> Options { get; }
 
-        public string Usage => getInstance.GetUsage();
+        public string Usage => getInstance.GetUsage().Or(String.Empty);
 
         public object ParseValue(Type type, string value)
         {

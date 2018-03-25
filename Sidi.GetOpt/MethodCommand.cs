@@ -16,7 +16,7 @@ namespace Sidi.GetOpt
 
         public MethodInfo Method => this.method;
 
-        public string Usage => this.method.GetUsage();
+        public string Usage => this.method.GetUsage().Or(String.Empty);
 
         public string ArgumentSyntax => this.method.GetArgumentSyntax();
 
