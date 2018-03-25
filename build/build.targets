@@ -163,6 +163,6 @@
 
   <Target Name="PublishBeta" DependsOnTargets="Test;Setup;ZipProductFiles;Tag;PublishOnDropbox" />
   
-  <Target Name="Release" DependsOnTargets="Test;Setup;ZipProductFiles" />
+  <Target Name="AllLocal" DependsOnTargets="Test;Setup;ZipProductFiles" />
   
 </Project>
