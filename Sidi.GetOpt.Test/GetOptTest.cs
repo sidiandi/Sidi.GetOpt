@@ -171,12 +171,28 @@ Options:
 
             Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--help" }));
 
-            Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--print", "sum", "1", "2", "3" }));
-            Assert.AreEqual(6.0, commands.Calculator.Result);
+        }
 
+        [Test]
+        public void OptionsInSubcommandsAreConsidered()
+        {
+            var commands = new Commands();
+            using (var c = new CaptureConsoleOutput())
+            {
+                Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "--print", "sum", "1", "2", "3" }));
+                Assert.AreEqual(true, commands.Calculator.Print);
+                Assert.AreEqual(6.0, commands.Calculator.Result);
+            }
+        }
+
+        [Test]
+        public void OptionsAfterArgumentsAreConsidered()
+        {
+            var commands = new Commands();
             using (var c = new CaptureConsoleOutput())
             {
                 Assert.AreEqual(0, GetOpt.Run(commands, new[] { "calculator", "sum", "1", "2", "3", "--print" }));
+                Assert.AreEqual(true, commands.Calculator.Print);
                 Assert.AreEqual(6.0, commands.Calculator.Result);
             }
         }
@@ -232,6 +248,37 @@ Options:
             var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "TestAsyncWithStringResult" });
             Assert.IsTrue(hw.TestAsyncWasCalled);
             Assert.AreEqual(0, exitCode);
+        }
+
+        [Test]
+        public void HandleExceptionsInAsyncMethodsCorrectly()
+        {
+            using (var c = new CaptureConsoleOutput())
+            {
+                var hw = new TestAsyncApp();
+                var exitCode = Sidi.GetOpt.GetOpt.Run(hw, new[] { "TestAsyncWithException" });
+                Assert.IsTrue(hw.TestAsyncWasCalled);
+                Assert.AreEqual(-1, exitCode);
+                StringAssert.Contains(TestAsyncApp.anErrorOccured, c.error.ToString());
+            }
+        }
+
+        [Test]
+        public void CustomExceptionHandler()
+        {
+            using (var c = new CaptureConsoleOutput())
+            {
+                var hw = new TestAsyncApp();
+                var go = new Sidi.GetOpt.GetOpt
+                {
+                    Application = hw,
+                    Arguments = new[] { "TestAsyncWithException" },
+                    OnException = (e) => -123
+                };
+                var exitCode = go.Run();
+                Assert.IsTrue(hw.TestAsyncWasCalled);
+                Assert.AreEqual(-123, exitCode);
+            }
         }
 
         [Test]

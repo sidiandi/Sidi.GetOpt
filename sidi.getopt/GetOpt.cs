@@ -11,8 +11,6 @@ namespace Sidi.GetOpt
 {
     public partial class GetOpt
     {
-        internal readonly ICommandSource commandSource;
-
         class Starter
         {
             [Module]
@@ -34,37 +32,45 @@ namespace Sidi.GetOpt
 
         public static int Run(object application, string[] args)
         {
+            return new GetOpt
+            {
+                Application = application,
+                Arguments = args
+            }.Run();
+        }
+
+        public int Run()
+        {
             try
             {
-                var a = new Args(args);
+                var a = new Args(this.Arguments);
+                if (OnException != null)
+                {
+                    a.OnException = (e) =>
+                    {
+                        return this.OnException(e);
+                    };
+                }
                 var entryAssembly = Assembly.GetCallingAssembly();
-                var programName = application.GetType().Assembly.GetName().Name;
-
-                /*
-                var rootCommand = new ObjectCommand(null, programName);
-                var commandSource = new ObjectCommandSource(rootCommand, ObjectProvider.Create(application)).Concat(
-                    new ObjectCommandSource(rootCommand, ObjectProvider.Create(new VersionOption(entryAssembly))), 
-                    new ObjectCommandSource(rootCommand, ObjectProvider.Create(new OptionArgumentFile(a)))
-                    );
-                rootCommand.CommandSource = commandSource;
-                */
-                var rootCommand = ObjectCommand.Create(programName, ObjectProvider.Create(new Starter(application, a)));
-
-                try
-                {
-                    return rootCommand.Invoke(a);
-                }
-                catch (Exception e)
-                {
-                    throw ParseError.ToParseError(a, e);
-                }
+                var programName = this.Application.GetType().Assembly.GetName().Name;
+                var rootCommand = ObjectCommand.Create(programName, ObjectProvider.Create(new Starter(this.Application, a)));
+                return rootCommand.Invoke(a);
             }
             catch (ParseError ex)
             {
                 Console.Error.WriteLine(ex.Message);
                 return -1;
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return -1;
+            }
         }
+
+        public string[] Arguments { set; get; }
+        public Func<Exception, int> OnException { set; get; }
+        public object Application { get; set; }
 
         /// <summary>
         /// if file equals "-", this methods opens Console.In. Otherwise, the file is opened.

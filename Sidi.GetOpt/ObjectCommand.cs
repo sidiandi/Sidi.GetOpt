@@ -107,7 +107,7 @@ namespace Sidi.GetOpt
                     optionText = null;
                 }
 
-                option.Set(valueText);
+                args.HandleException(() => option.Set(valueText));
             }
 
             return true;
@@ -153,7 +153,7 @@ namespace Sidi.GetOpt
                 }
             }
 
-            option.Set(valueText);
+            args.HandleException(() => option.Set(valueText));
             return true;
         }
 
@@ -187,7 +187,7 @@ namespace Sidi.GetOpt
 
         void ExecuteCommand(ICommand command, Args args)
         {
-            result = command.Invoke(args);
+            result = args.ConvertResultToInt(() => command.Invoke(args));
         }
 
         int result;

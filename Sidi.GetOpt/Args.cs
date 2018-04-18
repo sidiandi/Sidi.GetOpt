@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sidi.GetOpt
 {
@@ -19,6 +20,10 @@ namespace Sidi.GetOpt
             this.args = (args ?? throw new System.ArgumentNullException(nameof(args))).ToArray();
             LongOptionPrefix = new[] { "--" };
             ShortOptionPrefix = new[] { "-" };
+            OnException = (exception) =>
+            {
+                throw ParseError.ToParseError(this, exception);
+            };
         }
 
         public void Insert(IEnumerable<string> toInsert)
@@ -71,6 +76,61 @@ namespace Sidi.GetOpt
             else
             {
                 return false;
+            }
+        }
+
+        public Func<Exception, int> OnException { get; set; }
+
+        public int ConvertResultToInt(Func<object> call)
+        {
+            try
+            {
+                var r = call();
+                if (r is Task<int>)
+                {
+                    r = ((Task<int>)r).Result;
+                }
+                else if (r is IAsyncResult)
+                {
+                    var asyncResult = (IAsyncResult)r;
+                    asyncResult.AsyncWaitHandle.WaitOne();
+                }
+                var exitCode = r is int ? (int)r : 0;
+                return exitCode;
+            }
+            catch (Exception exception)
+            {
+                if (exception is System.AggregateException)
+                {
+                    var aggregate = (AggregateException)exception;
+                    var s = aggregate.InnerExceptions.SingleOrDefault();
+                    if (s != null)
+                    {
+                        exception = s;
+                    }
+                }
+                return OnException(exception);
+            }
+        }
+
+        internal void HandleException(Action a)
+        {
+            try
+            {
+                a();
+            }
+            catch (Exception exception)
+            {
+                if (exception is System.AggregateException)
+                {
+                    var aggregate = (AggregateException)exception;
+                    var s = aggregate.InnerExceptions.SingleOrDefault();
+                    if (s != null)
+                    {
+                        exception = s;
+                    }
+                }
+                OnException(exception);
             }
         }
     }

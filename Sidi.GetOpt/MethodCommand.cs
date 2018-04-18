@@ -73,22 +73,7 @@ namespace Sidi.GetOpt
                 throw new ParseError(args, String.Format("Too many parameters for {0}", this));
             }
             var instance = getInstance.Instance;
-            return ConvertResultToInt(this.method.Invoke(instance, parameters.ToArray()));
-        }
-
-        public static int ConvertResultToInt(object r)
-        {
-            if (r is Task<int>)
-            {
-                r = ((Task<int>)r).Result;
-            }
-            else if (r is IAsyncResult)
-            {
-                var asyncResult = (IAsyncResult)r;
-                asyncResult.AsyncWaitHandle.WaitOne();
-            }
-            var exitCode = r is int ? (int)r : 0;
-            return exitCode;
+            return args.ConvertResultToInt(() => this.method.Invoke(instance, parameters.ToArray()));
         }
 
         bool OptionStop(Args args)

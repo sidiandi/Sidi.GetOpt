@@ -22,6 +22,15 @@ namespace Sidi.GetOpt.Test
             return 123;
         }
 
+        public const string anErrorOccured = "An error occured.";
+
+        [Usage("Command to test correct exception handling")]
+        public async Task<int> TestAsyncWithException()
+        {
+            TestAsyncWasCalled = true;
+            throw new System.Exception(anErrorOccured);
+        }
+
         public bool TestAsyncWasCalled { get; private set; }
     }
 }
